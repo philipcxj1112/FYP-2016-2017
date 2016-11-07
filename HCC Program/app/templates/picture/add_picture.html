@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block body %}
+  <div class="row">
+        <div class="col-xs-12">
+        <div class="box">
+                <div class="box-header">
+                  <h3 class="box-title">添加圖片</h3>
+                </div><!-- /.box-header -->
+                <div class="box-body">
+                  <form action="add_picture_submit" method="post" enctype="multipart/form-data" id="adduser" role="form">
+                    <div class="form-group">
+                    <label>Picture</label>
+                    <input type="file" name="file" placeholder="picture"><br>
+                    <label>Music</label>
+                    <input type="file" name="file1" placeholder="music"><br>
+                    <input id="input1" type="text" name="title">儲存圖片/声音文件名（英文）
+                    <select name="address" id="content">
+                      <option value="canteen"> canteen </option>
+                      <option value="classroom"> classroom </option>
+                      <option value="playground"> playground </option>
+                    </select>
+                    </div> 
+                    
+                    <div class="form-group">
+                      <button type="submit" class="btn btn-primary">提交</button>
+                    </div>
+                    </div>
+                  </form>
+                </div><!-- /.box-body -->
+              </div><!-- /.box -->
+        <div class="col-xs-12">
+      </div>  
+{% endblock %}
+{% block js %}
+<script>
+    
+</script>
+{% endblock %}
+
