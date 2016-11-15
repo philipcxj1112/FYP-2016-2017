@@ -1,0 +1,364 @@
+var express = require('express');
+var anyDB = require('any-db');
+var config = require('../config.js');
+var bodyParser = require('body-parser');
+var expressValidator = require('express-validator');
+var cookieParser = require('cookie-parser');
+//var csrf = require('csurf');
+//var fs = require('fs');
+var multer  = require('multer');
+//var AWS = require('aws-sdk');
+
+var pool = anyDB.createPool('mysql://root:523422633@127.0.0.1/FYP2016', {
+	min: 2, max: 20
+});
+var inputPattern = {
+	name: /^[\w- ']+$/,
+	price: /^\d+(?:\.\d{1,2})?$/,
+	description: /^[\w- ',.!\r\n]+$/,
+	URL: /^[\w- ',.!:\/\r\n]+$/,
+};
+
+//var csrfProtection = csrf({ cookie: true })
+
+var app = express.Router();
+
+
+// for parsing application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({extended:true}));
+// this line must be immediately after express.bodyParser()!
+// Reference: https://www.npmjs.com/package/express-validator
+app.use(expressValidator());
+/*
+app.use('/', function(req, res, next) {
+	console.log(req.body);
+	return next();
+});
+*/
+// URL expected: http://hostname/admin/api/cat/add
+
+app.post('/user/add', function (req, res) {
+
+	// put your input validations and/or sanitizations here
+	// Reference: https://www.npmjs.com/package/express-validator
+	// Reference: https://github.com/chriso/validator.js
+	req.checkBody('pref', 'Invalid Preference')
+		.notEmpty()
+		.isInt();
+	req.checkBody('name', 'Invalid User Name')
+		.isLength(1, 512)
+		.matches(inputPattern.name);
+
+	// quit processing if encountered an input validation error
+	var errors = req.validationErrors();
+	if (errors) {
+		return res.status(400).json({'inputError': errors}).end();
+	}
+
+	// manipulate the DB accordingly using prepared statement 
+	// (Prepared Statement := use ? as placeholder for values in sql statement; 
+	//   They'll automatically be replaced by the elements in next array)
+	pool.query('INSERT INTO User (pref, uname) VALUES (?, ?)', 
+		[req.body.pref, req.body.name],
+		function (error, result) {
+			if (error) {
+				console.error(error);
+				return res.status(500).json({'dbError': 'check server log'}).end();
+			}
+
+			res.status(200).json(result).end();
+		}
+	);
+
+});
+
+app.post('/pic/location/add', function (req, res) {
+
+	// put your input validations and/or sanitizations here
+	// Reference: https://www.npmjs.com/package/express-validator
+	// Reference: https://github.com/chriso/validator.js
+	req.checkBody('photoURL', 'Invalid photoURL')
+		.isLength(1, 512)
+		.matches(inputPattern.URL);
+	req.checkBody('soundURL', 'Invalid soundURL')
+		.isLength(1, 512)
+		.matches(inputPattern.URL);
+	req.checkBody('lid', 'Invalid Location ID')
+		.notEmpty()
+		.isInt();
+	req.checkBody('description', 'Invalid Product Description')
+		.isLength(1, 1024)
+		.matches(inputPattern.description);
+
+	// quit processing if encountered an input validation error
+	var errors = req.validationErrors();
+	if (errors) {
+		return res.status(400).json({'inputError': errors}).end();
+	}
+
+	// manipulate the DB accordingly using prepared statement 
+	// (Prepared Statement := use ? as placeholder for values in sql statement; 
+	//   They'll automatically be replaced by the elements in next array)
+	pool.query('INSERT INTO Picture (lid, imgurl, soundurl, desc) VALUES (?, ?, ?, ?)', 
+		[req.body.lid, req.body.photoURL, req.body.soundURL, req.body.description],
+		function (error, result) {
+			if (error) {
+				console.error(error);
+				return res.status(500).json({'dbError': 'check server log'}).end();
+			}
+
+			res.status(200).json(result).end();
+		}
+	);
+
+});
+
+app.post('/pic/personal/add', function (req, res) {
+
+	// put your input validations and/or sanitizations here
+	// Reference: https://www.npmjs.com/package/express-validator
+	// Reference: https://github.com/chriso/validator.js
+	req.checkBody('photoURL', 'Invalid photoURL')
+		.isLength(1, 512)
+		.matches(inputPattern.URL);
+	req.checkBody('soundURL', 'Invalid soundURL')
+		.isLength(1, 512)
+		.matches(inputPattern.URL);
+	req.checkBody('uid', 'Invalid User ID')
+		.notEmpty()
+		.isInt();
+	req.checkBody('description', 'Invalid Product Description')
+		.isLength(1, 1024)
+		.matches(inputPattern.description);
+	var lid = 0;
+	// quit processing if encountered an input validation error
+	var errors = req.validationErrors();
+	if (errors) {
+		return res.status(400).json({'inputError': errors}).end();
+	}
+
+	// manipulate the DB accordingly using prepared statement 
+	// (Prepared Statement := use ? as placeholder for values in sql statement; 
+	//   They'll automatically be replaced by the elements in next array)
+	pool.query('INSERT INTO Picture (lid, imgurl, soundurl, desc, uid) VALUES (?, ?, ?, ?, ?)', 
+		[lid, req.body.photoURL, req.body.soundURL, req.body.description, req.body.uid],
+		function (error, result) {
+			if (error) {
+				console.error(error);
+				return res.status(500).json({'dbError': 'check server log'}).end();
+			}
+
+			res.status(200).json(result).end();
+		}
+	);
+
+});
+
+app.post('/pic/count', function (req, res) {
+
+	// put your input validations and/or sanitizations here
+	// Reference: https://www.npmjs.com/package/express-validator
+	// Reference: https://github.com/chriso/validator.js
+
+	// quit processing if encountered an input validation error
+
+	var errors = req.validationErrors();
+	if (errors) {
+		return res.status(400).json({'inputError': errors}).end();
+	}
+
+	// manipulate the DB accordingly using prepared statement 
+	// (Prepared Statement := use ? as placeholder for values in sql statement; 
+	//   They'll automatically be replaced by the elements in next array)
+	pool.query('SELECT COUNT(pid) FROM Picture', 
+		[req.params.pid],
+		function (error, result) {
+			if (error) {
+				console.error(error);
+				return res.status(500).json({'dbError': 'check server log'}).end();
+			}
+			res.status(200).json({'Picture': result.rows}).end();
+		}
+	);
+
+});
+
+app.post('/pic/remove', function (req, res) {
+	req.checkBody('pid', 'Invalid Picture ID')
+		.notEmpty()
+		.isInt();
+
+	// quit processing if encountered an input validation error
+	var errors = req.validationErrors();
+	if (errors) {
+		return res.status(400).json({'inputError': errors}).end();
+	}
+
+	pool.query('DELETE FROM Picture WHERE pid = ? LIMIT 1',
+		[req.body.pid],
+		function (error, result) {
+			if (error) {
+				console.error(error);
+				return res.status(500).json({'dbError': 'check server log'}).end();
+			}
+
+			if (result.affectedRows === 0) {
+				return res.status(400).json({'inputError': [{
+					param: 'pid', 
+					msg: 'Invalid Picture ID', 
+					value: req.body.pid
+				}]}).end();	
+			}
+			res.status(200).json(result).end();
+	});
+});
+
+app.post('/user/remove', function (req, res) {
+	req.checkBody('uid', 'Invalid User ID')
+		.notEmpty()
+		.isInt();
+
+	// quit processing if encountered an input validation error
+	var errors = req.validationErrors();
+	if (errors) {
+		return res.status(400).json({'inputError': errors}).end();
+	}
+
+	pool.query('DELETE FROM User WHERE uid = ? LIMIT 1',
+		[req.body.uid],
+		function (error, result) {
+			if (error) {
+				console.error(error);
+				return res.status(500).json({'dbError': 'check server log'}).end();
+			}
+
+			if (result.affectedRows === 0) {
+				return res.status(400).json({'inputError': [{
+					param: 'uid', 
+					msg: 'Invalid User ID', 
+					value: req.body.uid
+				}]}).end();	
+			}
+			res.status(200).json(result).end();
+	});
+});
+
+
+app.post('/pic/:pid', function (req, res) {
+
+	// put your input validations and/or sanitizations here
+	// Reference: https://www.npmjs.com/package/express-validator
+	// Reference: https://github.com/chriso/validator.js
+
+	// quit processing if encountered an input validation error
+
+	var errors = req.validationErrors();
+	if (errors) {
+		return res.status(400).json({'inputError': errors}).end();
+	}
+
+	// manipulate the DB accordingly using prepared statement 
+	// (Prepared Statement := use ? as placeholder for values in sql statement; 
+	//   They'll automatically be replaced by the elements in next array)
+	pool.query('SELECT * FROM Picture WHERE pid = (?)', 
+		[req.params.pid],
+		function (error, result) {
+			if (error) {
+				console.error(error);
+				return res.status(500).json({'dbError': 'check server log'}).end();
+			}
+			res.status(200).json({'Picture': result.rows}).end();
+		}
+	);
+
+});
+
+app.post('/user/:uid', function (req, res) {
+
+	// put your input validations and/or sanitizations here
+	// Reference: https://www.npmjs.com/package/express-validator
+	// Reference: https://github.com/chriso/validator.js
+
+	// quit processing if encountered an input validation error
+
+	var errors = req.validationErrors();
+	if (errors) {
+		return res.status(400).json({'inputError': errors}).end();
+	}
+
+	// manipulate the DB accordingly using prepared statement 
+	// (Prepared Statement := use ? as placeholder for values in sql statement; 
+	//   They'll automatically be replaced by the elements in next array)
+	pool.query('SELECT * FROM User WHERE uid = (?)', 
+		[req.params.uid],
+		function (error, result) {
+			if (error) {
+				console.error(error);
+				return res.status(500).json({'dbError': 'check server log'}).end();
+			}
+			pool.query('SELECT pid FROM Picture WHERE uid = (?)', 
+				[req.params.uid],
+				function (error, user) {
+					if (error) {
+						console.error(error);
+						return res.status(500).json({'dbError': 'check server log'}).end();
+					}
+					//res.status(500).json({'dbError': 'check server log'}).end();
+					res.status(200).json({'User': result.rows, 'Personal':user.rows}).end();
+				}
+			);	
+		});
+
+});
+
+app.post('/stat/:uid/:pid', function (req, res) {
+
+	// put your input validations and/or sanitizations here
+	// Reference: https://www.npmjs.com/package/express-validator
+	// Reference: https://github.com/chriso/validator.js
+
+	// quit processing if encountered an input validation error
+
+	var errors = req.validationErrors();
+	if (errors) {
+		return res.status(400).json({'inputError': errors}).end();
+	}
+
+	// manipulate the DB accordingly using prepared statement 
+	// (Prepared Statement := use ? as placeholder for values in sql statement; 
+	//   They'll automatically be replaced by the elements in next array)
+	pool.query('SELECT * FROM Stat WHERE pid = (?) AND uid = (?)', 
+		[req.params.pid, req.params.uid],
+		function (error, result) {
+			if (error) {
+				console.error(error);
+				return res.status(500).json({'dbError': 'check server log'}).end();
+			}
+			if(result.rowCount == 0){
+				pool.query('INSERT INTO Stat (uid, pid, count) VALUES (?, ?, 1)', 
+					[req.params.uid, req.params.pid],
+					function (error, insert) {
+						if (error) {
+							console.error(error);
+							return res.status(500).json({'dbError': 'check server log'}).end();
+						}
+					}
+				);
+			} else {
+				pool.query('UPDATE Stat set count = count + 1 WHERE uid = (?) AND pid = (?)', 
+					[req.params.uid, req.params.pid],
+					function (error, update) {
+						if (error) {
+							console.error(error);
+							return res.status(500).json({'dbError': 'check server log'}).end();
+						}
+					}
+				);			
+			}
+			res.status(200).json({'Update Sucess!':'yes'}).end();
+		}
+	);
+
+});
+
+module.exports = app;

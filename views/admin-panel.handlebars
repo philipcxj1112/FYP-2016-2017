@@ -1,0 +1,143 @@
+<section id="frame">
+<h1>IERG4210 Shop61 - Admin Panel</h1>
+
+<article id="main">
+
+<form id="logout" method="POST" action="/admin/api/logout">
+    <input type="submit" value="Logout" />
+</form>
+
+<section id="categoryPanel" class="panel">
+    <fieldset id="categoryNewPanel">
+        <legend>New Category</legend>
+        <form method="POST" action="/admin/api/cat/add">
+            <label for="catNewName">Name *</label>
+            <div><input id="catNewName" type="text" name="name" required pattern="^[\w- ']+$"/></div>
+            <input type="submit" value="Submit" />
+        </form>
+    </fieldset>
+
+    <fieldset id="categoryEditPanel">
+        <legend>Edit a Category</legend>
+        <form method="POST" action="/admin/api/cat/edit">
+            <label for="catEditCatId">Category *</label>
+            <select id="catEditCatId" name="catid" required>
+                <option value="">Please select a category</option>
+            {{#each cat}}
+                <option value="{{catid}}">{{name}}</option>
+            {{/each}}
+            </select>
+            <label for="catEditName">New Name *</label>
+            <div><input id="catEditName" type="text" name="name" required pattern="^[\w- ']+$" /></div>
+            <input type="submit" value="Submit" />
+        </form>
+    </fieldset>
+
+    <fieldset id="categoryRemovePanel">
+        <legend>Remove a Category</legend>
+        <form method="POST" action="/admin/api/cat/remove">
+            <label for="catEditCatId">Category *</label>
+            <select id="catEditCatId" name="catid" required>
+                <option value="">Please select a category</option>
+            {{#each cat}}
+                <option value="{{catid}}">{{name}}</option>
+            {{/each}}
+            </select>
+            <br><br>
+            <input type="submit" value="Submit" />
+        </form>
+    </fieldset>
+</section>
+
+<section id="productPanel" class="panel">
+    <fieldset id="productNewPanel">
+        <legend>New Product</legend>
+        <form method="POST" action="/admin/api/prod/add" enctype="multipart/form-data">
+            <label for="prodNewCatId">Category *</label>
+            <div>
+                <select id="prodNewCatId" name="catid" required>
+                    <option value="">Please select a category</option>
+                {{#each cat}}
+                    <option value="{{catid}}">{{name}}</option>
+                {{/each}}
+                </select>
+            </div>
+
+            <label for="prodNewName">Name *</label>
+            <div><input id="prodNewName" type="text" name="name" required pattern="^[\w- ']+$" /></div>
+
+            <label for="prodNewPrice">Price *</label>
+            <div><input id="prodNewPrice" type="number" step="0.05" name="price" required pattern="^\d+(?:\.\d{1,2})?$" /></div>
+
+            <label for="prodNewDescription">Description</label>
+            <div><textarea id="prodNewDescription" name="description" pattern="^[\w- ',.!\r\n]+$"></textarea></div>
+
+            <label for="prodNewImage">Image *</label>
+            <div><input id="prodNewImage" type="file" name="upload" required /></div>
+
+            <input type="submit" value="Submit" />
+        </form>
+    </fieldset>
+    
+    <section>
+        <fieldset id="productEditPanel">
+            <legend>Edit a Product</legend>
+            <form method="POST" action="/admin/api/prod/edit" enctype="multipart/form-data">
+                <label for="prodEditPId">Product *</label>
+                <div>
+                    <select id="prodEditPId" name="pid" required>
+                        <option value="">Please select a product</option>
+                    {{#each prod}}
+                        <option value="{{pid}}">{{name}}</option>
+                    {{/each}}
+                    </select>
+                </div>
+                <label for="prodEditCatId">Category *</label>
+                <div>
+                    <select id="prodEditCatId" name="catid" required>
+                        <option value="">Please select a category</option>
+                    {{#each cat}}
+                        <option value="{{catid}}">{{name}}</option>
+                    {{/each}}
+                    </select>
+                </div>
+                <label for="prodEditName">Name *</label>
+                <div><input id="prodEditName" type="text" name="name" required pattern="^[\w- ']+$" /></div>
+
+                <label for="prodEditPrice">Price *</label>
+                <div><input id="prodEditPrice" type="number" step="0.05" name="price" required pattern="^\d+(?:\.\d{1,2})?$"/></div>
+
+                <label for="prodEditDescription">Description</label>
+                <div><textarea id="prodEditDescription" name="description" pattern="^[\w- ',.!\r\n]+$"></textarea></div>
+
+                <label for="prodEditImage">Image</label>
+                <div id="prodEditImageDiv"><input id="prodEditImage" type="file" name="upload"/></div>
+
+                <input type="submit" value="Submit" />
+            </form>
+        </fieldset>
+    </section>
+    
+    <section>
+        <fieldset id="productRemovePanel">
+            <legend>Remove a Product</legend>
+            <form method="POST" action="/admin/api/prod/remove">
+            <label for="prodEditCatId">Product *</label>
+            <select id="prodEditCatId" name="pid" required>
+                <option value="">Please select a product</option>
+            {{#each prod}}
+                <option value="{{pid}}">{{name}}</option>
+            {{/each}}
+            </select>
+            <br><br>
+            <input type="submit" value="Submit" />
+        </form>
+        </fieldset>
+    </section>
+
+</section>
+<div class="clear"></div>
+
+</article>
+</section>
+<script type="text/javascript" src="/lib/admin-panel.js"></script>

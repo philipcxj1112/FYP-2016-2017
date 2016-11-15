@@ -1,0 +1,24 @@
+{
+  "name": "fyp2016",
+  "version": "1.0.0",
+  "description": "fyp2016",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/philipcxj1112/FYP-2016-2017.git"
+  },
+  "keywords": [
+    "education",
+    "CUHK",
+    "IERG4998X"
+  ],
+  "author": "philip",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/philipcxj1112/FYP-2016-2017/issues"
+  },
+  "homepage": "https://github.com/philipcxj1112/FYP-2016-2017#readme"
+}

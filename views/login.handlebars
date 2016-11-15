@@ -1,0 +1,18 @@
+<section id="frame">
+<h1>IERG4210 Shop61 - Admin Login</h1>
+<article id="main">
+
+<section id="loginPanel" class="panel">
+    <fieldset id="loginField">
+        <legend>Login</legend>
+        <form method="POST" action="/admin/api/login" enctype="application/x-www-form-urlencoded">
+            <label for="username">Username</label>
+            <div><input id="username" type="text" name="username" required pattern="^[\w- ']+$" /></div>
+            <label for="password">Password</label>
+            <div><input id="password" type="password" name="password" required pattern="^[\x20-\x7E]+$" /></div>
+            <input type="submit" value="Submit" />
+        </form>
+    </fieldset>
+</article>
+</section>
+<script type="text/javascript" src="/lib/login.js"></script>
