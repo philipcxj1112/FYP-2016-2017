@@ -1,2 +1,2 @@
-local-dev-env
-node_modules
+/local-dev-env/*
+/node_modules/*
