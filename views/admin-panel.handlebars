@@ -1,0 +1,161 @@
+<section id="frame">
+<h1>IERG4998 Final Year Project - Admin Panel</h1>
+
+<article id="main">
+
+<form id="logout" method="POST" action="/admin/api/logout">
+    <input type="submit" value="Logout" />
+</form>
+
+<section id="alterPanel" class="panel">
+
+    <fieldset id="userNewpanel">
+        <legend>Add New User</legend>
+        <form method="POST" action="/admin/api/user/add">
+            <label for="Newutype">User Type *</label>
+            <select id="Newutype" name="pref" required>
+                <option value="">Please select a user type</option>
+            {{#each type}}
+                <option value="{{pref}}">{{typename}}</option>
+            {{/each}}
+            </select>
+            <label for="Newuname">User Name *</label>
+            <div><input id="Newuname" type="text" name="uname" required pattern="^[\w- ']+$" /></div>
+            <input type="submit" value="Submit" />
+        </form>
+    </fieldset>
+
+    <fieldset id="locNewpanel">
+        <legend>Add New Location</legend>
+        <form method="POST" action="/admin/api/location/add">
+            <label for="Newlocname">Location Name *</label>
+            <div><input id="Newlocname" type="text" name="lname" required pattern="^[\w- ']+$"/></div>
+
+            <label for="NewuuidID">UUID *</label>
+            <div><input id="NewuuidID" type="text" name="UUID" required pattern="^[\w- ']+$"/></div>
+
+            <label for="NewmajID">Major *</label>
+            <div><input id="NewmajID" type="text" name="major" required pattern="^[\w- ']+$"/></div>
+
+            <label for="NewminID">Minor *</label>
+            <div><input id="NewminID" type="text" name="minor" required pattern="^[\w- ']+$"/></div>
+
+            <input type="submit" value="Submit" />
+        </form>
+    </fieldset>
+
+    <fieldset id="userRmpanel">
+        <legend>Remove User</legend>
+        <form method="POST" action="/admin/api/user/remove">
+            <label for="Rmuname">User Name *</label>
+            <select id="Rmuname" name="uid" required>
+                <option value="">Please select a user</option>
+            {{#each user}}
+                <option value="{{uid}}">{{uname}}</option>
+            {{/each}}
+            </select>
+            <br><br>
+            <input type="submit" value="Submit" />
+        </form>
+    </fieldset>
+
+    <fieldset id="picRmpanel">
+        <legend>Remove Picture</legend>
+        <form method="POST" action="/admin/api/picture/remove">
+            <label for="Rmpname">Picture Name*</label>
+            <select id="Rmpname" name="pid" required>
+                <option value="">Please select a picture</option>
+            {{#each pic}}
+                <option value="{{pid}}">{{pname}}</option>
+            {{/each}}
+            </select>
+            <br><br>
+            <input type="submit" value="Submit" />
+        </form>
+    </fieldset>
+
+    <fieldset id="locRmpanel">
+        <legend>Remove Location</legend>
+        <form method="POST" action="/admin/api/loc/remove">
+            <label for="Rmlname">Location *</label>
+            <select id="Rmlname" name="lid" required>
+                <option value="">Please select a location</option>
+            {{#each loc}}
+                <option value="{{lid}}">{{lname}}</option>
+            {{/each}}
+            </select>
+            <br><br>
+            <input type="submit" value="Submit" />
+        </form>
+    </fieldset>
+
+</section>
+
+<section id="picturePanel" class="panel">
+
+    <fieldset id="piclocNewpanel">
+        <legend>New Picture by Location</legend>
+        <form method="POST" action="/admin/api/pic/location/add" enctype="multipart/form-data"> 
+            
+            <label for="plNewName">Picture Name *</label>
+            <div><input id="plNewName" type="text" name="pname" required pattern="^[\w- ']+$" /></div>
+
+            <label for="plNewlid">Location *</label>
+            <div>
+                <select id="plNewlid" name="lid" required>
+                    <option value="">Please select a location</option>
+                {{#each loc}}
+                    <option value="{{lid}}">{{lname}}</option>
+                {{/each}}
+                </select>
+            </div>
+
+            <label for="plNewdesc">Description *</label>
+            <div><textarea id="plNewdesc" name="description" pattern="^[\w- ',.!\r\n]+$"></textarea></div>
+           
+			<label for="plNewImage">Image *</label>
+            <div><input id="plNewImage" type="file" name="img" required /></div>
+			
+			<label for="plNewSound">Image *</label>
+            <div><input id="plNewSound" type="file" name="sound" required /></div>
+			
+            <input type="submit" value="Submit" />
+        </form>
+    </fieldset>
+    
+    <fieldset id="picuserNewpanel">
+        <legend>New Picture by User</legend>
+        <form method="POST" action="/admin/api/pic/personal/add"> 
+            
+            <label for="puNewName">Picture Name *</label>
+            <div><input id="puNewName" type="text" name="pname" required pattern="^[\w- ']+$" /></div>
+
+            <label for="puNewlid">User *</label>
+            <div>
+                <select id="puNewlid" name="uid" required>
+                    <option value="">Please select a user</option>
+                {{#each user}}
+                    <option value="{{uid}}">{{uname}}</option>
+                {{/each}}
+                </select>
+            </div>
+
+            <label for="puNewimgurl">Img URL *</label>
+            <div><input id="puNewimgurl" type="url" name="imgurl" required pattern="https?://.+" title="Include http://" /></div>
+
+            <label for="puNewsdurl">Sound URL *</label>
+            <div><input id="puNewsdurl" type="url" name="imgurl" required pattern="https?://.+" title="Include http://" /></div>
+
+            <label for="puNewdesc">Description *</label>
+            <div><textarea id="plNewdesc" name="description" pattern="^[\w- ',.!\r\n]+$"></textarea></div>
+
+            <input type="submit" value="Submit" />
+        </form>
+    </fieldset>
+
+</section>
+<div class="clear"></div>
+
+</article>
+</section>
+<script type="text/javascript" src="/lib/admin-panel.js"></script>

@@ -22,20 +22,34 @@ app.get('/',  function (req, res) {
 			res.status(500).end();
 			return;
 		}
-
-		pool.query('SELECT * FROM User', function (error, user) {
+		pool.query('SELECT * FROM Location', function (error, loc) {
 			if (error) {
 				console.error(error);
 				res.status(500).end();
 				return;
 			}
-			res.render('admin-panel', {
-				layout: 'admin',
-		    	title: '2016 Final Year Project',
-		    	pic: picture.rows,
-		    	user: user.rows
-		    });
-
+			pool.query('SELECT * FROM User', function (error, user) {
+				if (error) {
+					console.error(error);
+					res.status(500).end();
+					return;
+				}
+				pool.query('SELECT * FROM Usertype', function (error, type) {
+				if (error) {
+					console.error(error);
+					res.status(500).end();
+					return;
+				}
+					res.render('admin-panel', {
+						layout: 'admin',
+						title: '2016 Final Year Project',
+						pic: picture.rows,
+						user: user.rows,
+						loc: loc.rows,
+						type: type.rows
+					});
+				});
+			});
 		});
 	});
 });
