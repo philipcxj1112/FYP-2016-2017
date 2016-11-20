@@ -61,7 +61,7 @@
 
     <fieldset id="picRmpanel">
         <legend>Remove Picture</legend>
-        <form method="POST" action="/admin/api/picture/remove">
+        <form method="POST" action="/admin/api/pic/remove">
             <label for="Rmpname">Picture Name*</label>
             <select id="Rmpname" name="pid" required>
                 <option value="">Please select a picture</option>
@@ -116,7 +116,7 @@
 			<label for="plNewImage">Image *</label>
             <div><input id="plNewImage" type="file" name="img" required /></div>
 			
-			<label for="plNewSound">Image *</label>
+			<label for="plNewSound">Sound *</label>
             <div><input id="plNewSound" type="file" name="sound" required /></div>
 			
             <input type="submit" value="Submit" />
@@ -125,14 +125,14 @@
     
     <fieldset id="picuserNewpanel">
         <legend>New Picture by User</legend>
-        <form method="POST" action="/admin/api/pic/personal/add"> 
+        <form method="POST" action="/admin/api/pic/personal/add" enctype="multipart/form-data"> 
             
             <label for="puNewName">Picture Name *</label>
             <div><input id="puNewName" type="text" name="pname" required pattern="^[\w- ']+$" /></div>
 
-            <label for="puNewlid">User *</label>
+            <label for="puNewuid">User *</label>
             <div>
-                <select id="puNewlid" name="uid" required>
+                <select id="puNewuid" name="uid" required>
                     <option value="">Please select a user</option>
                 {{#each user}}
                     <option value="{{uid}}">{{uname}}</option>
@@ -140,14 +140,51 @@
                 </select>
             </div>
 
-            <label for="puNewimgurl">Img URL *</label>
-            <div><input id="puNewimgurl" type="url" name="imgurl" required pattern="https?://.+" title="Include http://" /></div>
-
-            <label for="puNewsdurl">Sound URL *</label>
-            <div><input id="puNewsdurl" type="url" name="imgurl" required pattern="https?://.+" title="Include http://" /></div>
-
             <label for="puNewdesc">Description *</label>
             <div><textarea id="plNewdesc" name="description" pattern="^[\w- ',.!\r\n]+$"></textarea></div>
+
+            <label for="puNewImage">Image *</label>
+            <div><input id="puNewImage" type="file" name="img" required /></div>
+            
+            <label for="puNewSound">Sound *</label>
+            <div><input id="puNewSound" type="file" name="sound" required /></div>
+
+            <input type="submit" value="Submit" />
+        </form>
+    </fieldset>
+
+     <fieldset id="picEditpanel">
+        <legend>Edit picture</legend>
+        <form method="POST" action="/admin/api/pic/edit" > 
+            
+            <label for="pEditImagelist">Picture *</label><br>
+            <div>
+                <select id="pEditImagelist" name="pid" required>
+                    <option value="">Please select a picture</option>
+                {{#each pic}}
+                    <option value="{{pid}}">{{pname}}</option>
+                {{/each}}
+                </select>
+            </div>
+			<div id = "OrgPicture"></div>
+
+            <label for="pEditname">Picture Name *</label>
+            <div><input id="pEditName" type="text" name="pname" required pattern="^[\w- ']+$" /></div>
+
+            <label for="pEditlid">Location *</label>
+            <div>
+                <select id="pEditlid" name="lid" required>
+                    <option value="">Please select a location</option>
+                {{#each loc}}
+                    <option value="{{lid}}">{{lname}}</option>
+                {{/each}}
+                </select>
+            </div>
+
+            <label for="pEditdesc">Description *</label>
+            <div><textarea id="pEditdesc" name="description" pattern="^[\w- ',.!\r\n]+$"></textarea></div>
+
+      
 
             <input type="submit" value="Submit" />
         </form>

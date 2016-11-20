@@ -10,7 +10,21 @@ var multer = require('multer');
 //var AWS = require('aws-sdk');
 var host = '192.168.26.128:8080'
 
-var upload = multer({ dest: 'public/uploads/' });
+
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/uploads/')
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname )
+  }
+})
+
+var upload = multer({ storage: storage })
+
+
+
+//var upload = multer({ dest: 'public/uploads/' });
 
 var pool = anyDB.createPool('mysql://root:523422633@127.0.0.1/FYP2016', {
     min: 2, max: 20
@@ -103,17 +117,21 @@ app.post('/pic/location/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
 
     var upload = req.files;
 
-    if (!/^image\/(jpeg|png|gif)$/i.test(upload.img.mimetype)) {
+    if (!/^image\/(jpeg|png|gif)$/i.test(upload.img[0].mimetype)) {
         return res.status(403).json({'imageInputError':'expect image file'}).end();
     }
 
-    if (!/^audio\/(mp3|wma)$/i.test(upload.sound.mimetype)) {
+    if (!/^audio\/(mp3|wma)$/i.test(upload.sound[0].mimetype)) {
         return res.status(403).json({'imageInputError':'expect sound file'}).end();
     }
 	
-	var img = 'http://' + host + req.files.img.path;
+	var imgurl = 'http://' + host + '/uploads/'+ req.files.img[0].originalname;
 	
-	var sound = 'http://' + host + req.file.sound.path;
+	var soundurl = 'http://' + host + '/uploads/' +req.files.sound[0].originalname;
+	
+	console.log(imgurl);
+	console.log(soundurl);
+	console.log(req.files);
 	
     // manipulate the DB accordingly using prepared statement 
     // (Prepared Statement := use ? as placeholder for values in sql statement; 
@@ -129,14 +147,30 @@ app.post('/pic/location/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
 		        return res.status(400).json({ 'inputError': 'Invalid Location' }).end();
 		    }
 		    else {
-		        pool.query('INSERT INTO Picture (lid, imgurl, soundurl, description) VALUES (?, ?, ?, ?)',
-					[req.body.lid, img, sound, req.body.description],
+		        pool.query('INSERT INTO Picture (imgurl, soundurl, description, pname) VALUES (?, ?, ?, ?)',
+					[ imgurl, soundurl, req.body.description, req.body.pname],
 					function (error, result) {
 					    if (error) {
 					        console.error(error);
 					        return res.status(500).json({ 'dbError': 'check server log' }).end();
 					    }
-					    res.status(200).json(result).end();
+						pool.query('SELECT * FROM Picture WHERE imgurl = ? AND soundurl = ?',
+							[imgurl, soundurl],
+							function (error, pic) {
+								if (error) {
+									console.error(error);
+									return res.status(500).json({ 'dbError': 'check server log' }).end();
+								}
+								pool.query('INSERT INTO PLrelation (lid, pid) VALUES (?, ?)',
+									[req.body.lid, pic.rows[0].pid],
+									function (error, update) {
+										if (error) {
+											console.error(error);
+											return res.status(500).json({ 'dbError': 'check server log' }).end();
+										}						
+										res.status(200).json(result).end();
+								});
+						});
 					}
                 );
 		    }
@@ -150,6 +184,9 @@ app.post('/pic/personal/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
     // put your input validations and/or sanitizations here
     // Reference: https://www.npmjs.com/package/express-validator
     // Reference: https://github.com/chriso/validator.js
+	//console.log(req.files.img);
+	
+
 
     req.checkBody('uid', 'Invalid User ID')
 		.notEmpty()
@@ -170,45 +207,51 @@ app.post('/pic/personal/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
 
     var upload = req.files;
 
-    if (!/^image\/(jpeg|png|gif)$/i.test(upload.img.mimetype)) {
+    //console.log(upload.img[0].fieldname);
+
+    if (!/^image\/(jpeg|png|gif|jpg)$/i.test(upload.img[0].mimetype)) {
         return res.status(403).json({'imageInputError':'expect image file'}).end();
     }
 
-    if (!/^audio\/(mp3|wma)$/i.test(upload.sound.mimetype)) {
+    if (!/^audio\/(mp3|wma)$/i.test(upload.sound[0].mimetype)) {
         return res.status(403).json({'imageInputError':'expect audio file'}).end();
     }
 	
-	var img = 'http://' + host + req.files.img.path;
+	var imgurl = 'http://' + host + '/uploads/'+ req.files.img[0].originalname;
 	
-	var sound = 'http://' + host + req.file.sound.path;
+	var soundurl = 'http://' + host + '/uploads/' +req.files.sound[0].originalname;
 	
+	console.log(imgurl);
+	console.log(soundurl);
+	console.log(req.files);
+
     // manipulate the DB accordingly using prepared statement 
     // (Prepared Statement := use ? as placeholder for values in sql statement; 
     //   They'll automatically be replaced by the elements in next array)
-    pool.query('SELECT * FROM Picture Where photoURL = (?) AND soundURL = (?)',
-		[img, sound],
+    pool.query('SELECT * FROM Picture Where imgurl = (?) AND soundURL = (?)',
+		[imgurl, soundurl],
 		function (error, pcheck) {
 		    if (error) {
 		        console.error(error);
 		        return res.status(500).json({ 'dbError': 'check server log' }).end();
 		    }
 		    if (pcheck.rowCount == 0) {
-		        pool.query('INSERT INTO Picture (lid, imgurl, soundurl, desc) VALUES (?, ?, ?, ?)',
-                    [lid, img, sound, req.body.description],
+		        pool.query('INSERT INTO Picture (imgurl, soundurl, description, pname) VALUES ( ?, ?, ?, ?)',
+                    [ imgurl, soundurl, req.body.description, req.body.pname],
                      function (error, insert) {
                          if (error) {
                              console.error(error);
                              return res.status(500).json({ 'dbError': 'check server log' }).end();
                          }
-                         pool.query('SELECT pid FROM Picture WHERE photoURL = (?) AND soundURL = (?)',
-                            [img, sound],
+                         pool.query('SELECT pid FROM Picture WHERE imgurl = (?) AND soundURL = (?)',
+                            [imgurl, soundurl],
                             function (error, getpid) {
                                 if (error) {
                                     console.error(error);
                                     return res.status(500).json({ 'dbError': 'check server log' }).end();
                                 }
-                                pool.query('INSERT INTO UPrelation (uid, pid) VALUES (?, ?)',
-                                    [getpid.rows.pid, req.body.uid],
+                                pool.query('INSERT INTO UPrelation (pid, uid) VALUES (?, ?)',
+                                    [getpid.rows[0].pid, req.body.uid],
                                     function (error, result) {
                                         if (error) {
                                             console.error(error);
@@ -262,7 +305,7 @@ app.post('/pic/edit', function (req, res) {
 					value: req.body.pid
 				}]}).end();	
 			}
-			res.status(200).json({'prodEdit': result.rows}).end();
+			res.status(200).json({'picEdit': result.rows}).end();
 	});
 });
 
@@ -285,7 +328,7 @@ app.post('/pic/edit/update', function (req, res) {
 	if (errors) {
 		return res.status(400).json({'inputError': errors}).end();
 	}
-	pool.query('UPDATE Picture SET lid = ?, description = ?, pname = ? WHERE pid = ?', 
+	pool.query('UPDATE Picture SET description = ?, pname = ? WHERE pid = ?', 
 		[req.body.lid, req.body.description, req.body.pname ,req.body.pid],
 		function (error, result) {
 			if (error) {
@@ -404,7 +447,7 @@ app.post('/pic/remove', function (req, res) {
 		            }]
 		   		}).end();
 		    }
-		    pool.query('DELETE FROM LPrelation WHERE pid = ?',
+		    pool.query('DELETE FROM PLrelation WHERE pid = ?',
 				[req.body.pid],
 				function (error, lprelate) {
 		    		if (error) {
