@@ -125,9 +125,9 @@ app.post('/pic/location/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
         return res.status(403).json({'imageInputError':'expect sound file'}).end();
     }
 	
-	var imgurl = 'http://' + host + '/uploads/'+ req.files.img[0].originalname;
+	var imgurl = '/uploads/'+ req.files.img[0].originalname;
 	
-	var soundurl = 'http://' + host + '/uploads/' +req.files.sound[0].originalname;
+	var soundurl = '/uploads/' +req.files.sound[0].originalname;
 	
 	console.log(imgurl);
 	console.log(soundurl);
@@ -217,9 +217,9 @@ app.post('/pic/personal/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
         return res.status(403).json({'imageInputError':'expect audio file'}).end();
     }
 	
-	var imgurl = 'http://' + host + '/uploads/'+ req.files.img[0].originalname;
+	var imgurl = '/uploads/'+ req.files.img[0].originalname;
 	
-	var soundurl = 'http://' + host + '/uploads/' +req.files.sound[0].originalname;
+	var soundurl = '/uploads/' +req.files.sound[0].originalname;
 	
 	console.log(imgurl);
 	console.log(soundurl);
@@ -641,13 +641,26 @@ app.post('/user/:uid', function (req, res) {
 
 });
 
-app.post('/stat/:uid/:pid', function (req, res) {
+app.get('/stat/:uid/:pid/:lid', function (req, res) {
 
     // put your input validations and/or sanitizations here
     // Reference: https://www.npmjs.com/package/express-validator
     // Reference: https://github.com/chriso/validator.js
 
     // quit processing if encountered an input validation error
+	
+	var date  = new Date();
+    var year = date.getFullYear();
+
+    var month = date.getMonth() + 1;
+    month = (month < 10 ? "0" : "") + month;
+
+    var day  = date.getDate();
+    day = (day < 10 ? "0" : "") + day;
+	
+	var currentdate = day+'/'+month+'/'+year;
+	var dformat = '%d/%m/%Y';
+	
 
     var errors = req.validationErrors();
     if (errors) {
@@ -657,16 +670,16 @@ app.post('/stat/:uid/:pid', function (req, res) {
     // manipulate the DB accordingly using prepared statement 
     // (Prepared Statement := use ? as placeholder for values in sql statement; 
     //   They'll automatically be replaced by the elements in next array)
-    pool.query('SELECT * FROM Stat WHERE pid = (?) AND uid = (?)',
-		[req.params.pid, req.params.uid],
+    pool.query('SELECT * FROM stat WHERE pid = (?) AND uid = (?) AND lid = (?)',
+		[req.params.pid, req.params.uid, req.param.lid],
 		function (error, result) {
 		    if (error) {
 		        console.error(error);
 		        return res.status(500).json({ 'dbError': 'check server log' }).end();
 		    }
 		    if (result.rowCount == 0) {
-		        pool.query('INSERT INTO Stat (uid, pid, count) VALUES (?, ?, 1)',
-					[req.params.uid, req.params.pid],
+		        pool.query('INSERT INTO stat (uid, pid, lid, count, rdate) VALUES (?, ?, ?, 1, STR_TO_DATE(?, ?))',
+					[req.params.uid, req.params.pid, req.params.lid, currentdate, dformat],
 					function (error, insert) {
 					    if (error) {
 					        console.error(error);
@@ -675,8 +688,8 @@ app.post('/stat/:uid/:pid', function (req, res) {
 					}
 				);
 		    } else {
-		        pool.query('UPDATE Stat set count = count + 1 WHERE uid = (?) AND pid = (?)',
-					[req.params.uid, req.params.pid],
+		        pool.query('UPDATE stat set count = count + 1 WHERE uid = (?) AND pid = (?) AND lid = (?)',
+					[req.params.uid, req.params.pid, req.param.lid],
 					function (error, update) {
 					    if (error) {
 					        console.error(error);
