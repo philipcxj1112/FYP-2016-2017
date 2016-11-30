@@ -8,7 +8,7 @@ var cookieParser = require('cookie-parser');
 var fs = require('fs');
 var multer = require('multer');
 //var AWS = require('aws-sdk');
-var host = '192.168.26.128:8080'
+//var host = '192.168.26.128:8080'
 
 
 var storage = multer.diskStorage({
@@ -641,7 +641,7 @@ app.post('/user/:uid', function (req, res) {
 
 });
 
-app.get('/stat/:uid/:pid/:lid', function (req, res) {
+app.post('/stat/:uid/:pid/:lid', function (req, res) {
 
     // put your input validations and/or sanitizations here
     // Reference: https://www.npmjs.com/package/express-validator
