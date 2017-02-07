@@ -52,8 +52,8 @@ app.use('/', function(req, res, next) {
 	else {
 		res.redirect('https://' + req.headers.host + req.originalUrl); 
 	}
-});*/
-
+});
+*/
 app.get('/login', function (req, res) {
     if (req.session.admin)
         return res.redirect('/admin');

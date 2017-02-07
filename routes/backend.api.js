@@ -641,7 +641,7 @@ app.post('/user/:uid', function (req, res) {
 
 });
 
-app.post('/stat/:uid/:pid/:lid', function (req, res) {
+app.get('/stat/:uid/:pid/:lid', function (req, res) {
 
     // put your input validations and/or sanitizations here
     // Reference: https://www.npmjs.com/package/express-validator
@@ -671,7 +671,7 @@ app.post('/stat/:uid/:pid/:lid', function (req, res) {
     // (Prepared Statement := use ? as placeholder for values in sql statement; 
     //   They'll automatically be replaced by the elements in next array)
     pool.query('SELECT * FROM stat WHERE pid = (?) AND uid = (?) AND lid = (?)',
-		[req.params.pid, req.params.uid, req.param.lid],
+		[req.params.pid, req.params.uid, req.params.lid],
 		function (error, result) {
 		    if (error) {
 		        console.error(error);
@@ -689,7 +689,7 @@ app.post('/stat/:uid/:pid/:lid', function (req, res) {
 				);
 		    } else {
 		        pool.query('UPDATE stat set count = count + 1 WHERE uid = (?) AND pid = (?) AND lid = (?)',
-					[req.params.uid, req.params.pid, req.param.lid],
+					[req.params.uid, req.params.pid, req.params.lid],
 					function (error, update) {
 					    if (error) {
 					        console.error(error);
