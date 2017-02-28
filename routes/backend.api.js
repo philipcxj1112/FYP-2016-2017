@@ -679,8 +679,8 @@ app.get('/stat/:uid/:pid/:lid', function (req, res) {
     // manipulate the DB accordingly using prepared statement 
     // (Prepared Statement := use ? as placeholder for values in sql statement; 
     //   They'll automatically be replaced by the elements in next array)
-    pool.query('SELECT * FROM stat WHERE pid = (?) AND uid = (?) AND lid = (?)',
-		[req.params.pid, req.params.uid, req.params.lid],
+    pool.query('SELECT * FROM stat WHERE pid = (?) AND uid = (?) AND lid = (?) AND rdate = STR_TO_DATE(?, ?)',
+		[req.params.pid, req.params.uid, req.params.lid, currentdate, dformat],
 		function (error, result) {
 		    if (error) {
 		        console.error(error);
@@ -697,8 +697,8 @@ app.get('/stat/:uid/:pid/:lid', function (req, res) {
 					}
 				);
 		    } else {
-		        pool.query('UPDATE stat set count = count + 1 WHERE uid = (?) AND pid = (?) AND lid = (?)',
-					[req.params.uid, req.params.pid, req.params.lid],
+		        pool.query('UPDATE stat set count = count + 1 WHERE uid = (?) AND pid = (?) AND lid = (?) AND rdate = STR_TO_DATE(?, ?)',
+					[req.params.uid, req.params.pid, req.params.lid, currentdate, dformat],
 					function (error, update) {
 					    if (error) {
 					        console.error(error);
