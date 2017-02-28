@@ -114,7 +114,7 @@ app.get('/result', function (req, res) {
                 res.status(500).end();
                 return;
             }
-            res.render('admin-panel-User', {
+            res.render('admin-panel-Results', {
                 layout: 'admin',
                 title: '2016 Final Year Project',
                 user: user.rows,
