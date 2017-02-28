@@ -1,0 +1,131 @@
+<ul>
+<br>
+  <h1 style="color:white; text-align:center;">IERG4999 - Admin Panel</h1>
+  <li><a href="/admin/user">Update User</a></li>
+  <li><a class="active" href="/admin/pic">Update Picture</a></li>
+  <li><a href="/admin/loc">Update Location</a></li>
+  <li><a href="/admin/result">Analytic Results</a></li>
+  <li style="float:right"><input type="submit" class="button" id="logout" method="POST" action="/admin/api/logout"/ value="Logout"></li>
+</ul>
+
+<br>
+
+<fieldset id="picRmpanel">
+        <legend><b>Remove Picture</b></legend>
+        <form method="POST" action="/admin/api/pic/remove">
+            <label for="Rmpname">Picture Name*</label><br>
+            <select id="Rmpname" name="pid" required>
+                <option value="">Please select a picture</option>
+            {{#each pic}}
+                <option value="{{pid}}">{{pname}}</option>
+            {{/each}}
+            </select>
+            <br><br>
+            <input type="submit" value="Submit" />
+        </form>
+</fieldset>
+
+<br>
+
+<fieldset id="piclocNewpanel">
+        <legend><b>New Picture by Location</b></legend>
+        <form method="POST" action="/admin/api/pic/location/add" enctype="multipart/form-data"> 
+            
+            <label for="plNewName">Picture Name *</label>
+            <div><input id="plNewName" type="text" name="pname" required pattern="^[\w- ']+$" /></div>
+
+            <label for="plNewlid">Location *</label>
+            <div>
+                <select id="plNewlid" name="lid" required>
+                    <option value="">Please select a location</option>
+                {{#each loc}}
+                    <option value="{{lid}}">{{lname}}</option>
+                {{/each}}
+                </select>
+            </div>
+
+            <label for="plNewdesc">Description *</label>
+            <div><textarea id="plNewdesc" name="description" pattern="^[\w- ',.!\r\n]+$"></textarea></div>
+           
+      <label for="plNewImage">Image *</label>
+            <div><input id="plNewImage" type="file" name="img" required /></div>
+      
+      <label for="plNewSound">Sound *</label>
+            <div><input id="plNewSound" type="file" name="sound" required /></div>
+      
+            <input type="submit" value="Submit" />
+        </form>
+</fieldset>
+    
+<br>
+
+<fieldset id="picuserNewpanel">
+        <legend><b>New Picture by User</b></legend>
+        <form method="POST" action="/admin/api/pic/personal/add" enctype="multipart/form-data"> 
+            
+            <label for="puNewName">Picture Name *</label>
+            <div><input id="puNewName" type="text" name="pname" required pattern="^[\w- ']+$" /></div>
+
+            <label for="puNewuid">User *</label>
+            <div>
+                <select id="puNewuid" name="uid" required>
+                    <option value="">Please select a user</option>
+                {{#each user}}
+                    <option value="{{uid}}">{{uname}}</option>
+                {{/each}}
+                </select>
+            </div>
+
+            <label for="puNewdesc">Description *</label>
+            <div><textarea id="plNewdesc" name="description" pattern="^[\w- ',.!\r\n]+$"></textarea></div>
+
+            <label for="puNewImage">Image *</label>
+            <div><input id="puNewImage" type="file" name="img" required /></div>
+            
+            <label for="puNewSound">Sound *</label>
+            <div><input id="puNewSound" type="file" name="sound" required /></div>
+
+            <input type="submit" value="Submit" />
+        </form>
+</fieldset>
+
+<br>
+
+<fieldset id="picEditpanel">
+        <legend><b>Edit picture</b></legend>
+        <form method="POST" action="/admin/api/pic/edit" > 
+            
+            <label for="pEditImagelist">Picture *</label><br>
+			
+            <div>
+                <select id="pEditImagelist" name="pid" required>
+                    <option value="">Please select a picture</option>
+                {{#each pic}}
+                    <option value="{{pid}}">{{pname}}</option>
+                {{/each}}
+                </select>
+            </div>
+			
+			<div id = "OrgPicture"></div>
+			
+            <label for="pEditname">Picture Name *</label>
+            <div><input id="pEditName" type="text" name="pname" required pattern="^[\w- ']+$" /></div>
+
+            <label for="pEditlid">Location *</label>
+            <div>
+                <select id="pEditlid" name="lid" required>
+                    <option value="">Please select a location</option>
+                {{#each loc}}
+                    <option value="{{lid}}">{{lname}}</option>
+                {{/each}}
+                </select>
+            </div>
+
+            <label for="pEditdesc">Description *</label>
+            <div><textarea id="pEditdesc" name="description" pattern="^[\w- ',.!\r\n]+$"></textarea></div>
+
+            <input type="submit" value="Submit" />
+        </form>
+</fieldset>
+
+<script type="text/javascript" src="/lib/admin-panel-pic.js"></script>

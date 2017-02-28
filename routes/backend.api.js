@@ -65,7 +65,16 @@ app.post('/user/add', function (req, res) {
     req.checkBody('uname', 'Invalid User Name')
 		.isLength(1, 512)
 		.matches(inputPattern.name);
-
+	req.checkBody('sid', 'Invalid User ID')
+		.isLength(1, 512)
+		.matches(inputPattern.name);
+    req.checkBody('utscore', 'Invalid User Test Score Input')
+		.isLength(1, 512)
+		.matches(inputPattern.name);
+	req.checkBody('udesc', 'Invalid Description')
+		.isLength(1, 512)
+		.matches(inputPattern.description);
+		
     // quit processing if encountered an input validation error
     var errors = req.validationErrors();
     if (errors) {
@@ -75,8 +84,8 @@ app.post('/user/add', function (req, res) {
     // manipulate the DB accordingly using prepared statement 
     // (Prepared Statement := use ? as placeholder for values in sql statement; 
     //   They'll automatically be replaced by the elements in next array)
-    pool.query('INSERT INTO User (pref, uname) VALUES (?, ?)',
-		[req.body.pref, req.body.uname],
+    pool.query('INSERT INTO User (pref, uname, sid, utscore, description) VALUES (?, ?, ?, ?, ?)',
+		[req.body.pref, req.body.uname, req.body.sid, req.body.utscore, req.body.udesc],
 		function (error, result) {
 		    if (error) {
 		        console.error(error);
@@ -702,6 +711,40 @@ app.get('/stat/:uid/:pid/:lid', function (req, res) {
 		}
 	);
 
+});
+
+
+//new added
+app.post('/result', function (req, res) {
+    req.checkBody('uid', 'Invalid User ID')
+		.notEmpty()
+		.isInt();
+
+    // quit processing if encountered an input validation error
+    var errors = req.validationErrors();
+    if (errors) {
+        return res.status(400).json({ 'inputError': errors }).end();
+    }
+
+    pool.query('SELECT * FROM User WHERE uid = (?)',
+		[req.body.uid],
+		function (error, result) {
+		    if (error) {
+		        console.error(error);
+		        return res.status(500).json({ 'dbError': 'check server log' }).end();
+		    }
+			
+			if (result.affectedRows === 0) {
+		        return res.status(400).json({
+		            'inputError': [{
+		                param: 'uid',
+		                msg: 'Invalid User ID',
+		                value: req.body.uid
+		            }]
+		        }).end();
+		    }
+		}
+	);
 });
 
 

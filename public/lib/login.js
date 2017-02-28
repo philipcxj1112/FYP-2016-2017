@@ -28,16 +28,16 @@ function onSubmitHandler(e) {
 			if (res.error) {
 				if (res.body.dbError) {
 					alert(res.body.dbError);
-					location.href = '/admin';
+					location.href = '/admin/user';
 				} else if (res.body.loginError) {
 					alert(res.body.dbError);
-					location.href = '/admin';
+					location.href = '/admin/user';
 				} 
 				return console.error(res.error);
 			}
 			if (res.body.loginOK) {
 					//alert('OK');
-					location.href = '/admin';
+					location.href = '/admin/user';
 				}
 			
 		});

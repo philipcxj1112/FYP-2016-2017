@@ -1,0 +1,91 @@
+<ul>
+<br>
+  <h1 style="color:white; text-align:center;">IERG4999 - Admin Panel</h1>
+  <li><a class="active" href="/admin/user">Update User</a></li>
+  <li><a href="/admin/pic">Update Picture</a></li>
+  <li><a href="/admin/loc">Update Location</a></li>
+  <li><a href="/admin/result">Analytic Results</a></li>
+  <li style="float:right"><input type="submit" class="button" id="logout" method="POST" action="/admin/api/logout"/ value="Logout"></li>
+</ul>
+
+<br>
+<fieldset id="userNewpanel">
+        <legend><b>Add New User</b></legend>
+        <form method="POST" action="/admin/api/user/add">
+            <label for="Newutype">User Type *</label><br>
+            <select id="Newutype" name="pref" required>
+                <option value="">Please select a user type</option>
+            {{#each type}}
+                <option value="{{pref}}">{{typename}}</option>
+            {{/each}}
+            </select>
+            <br>
+            <label for="Newuname">User Name *</label>
+            <div>
+                <input id="Newuname" type="text" name="uname" required pattern="^[\w- ']+$" />
+            </div>
+
+            <!--new add-->
+            <label for="Newuname">User ID *</label>
+			<div>
+                <input id="Newuname" type="text" name="sid" required pattern="^[\w- ']+$" />
+            </div>
+            <label for="Newuname">Test Score * </label>
+            <div>
+                <input id="UTestscore" type="text" name="utscore" required pattern="^[\w- ']+$" />
+            </div>
+            <label for="Newuname">Description *</label>
+            <div>
+                <input id="UDesc" type="text" name="udesc" required pattern="^[\w- ']+$" />
+            </div>
+            <!--new add-->
+
+            <input type="submit" value="Submit" />
+        </form>
+</fieldset>
+
+<br>
+<fieldset id="userEditpanel">
+        <legend><b>Edit User</b></legend>
+        <form method="POST" action="/admin/api/user/edit/update" > 
+            
+			<label for="uEditname">User Name *</label><br>
+            <select id="uEditname" name="uid" required>
+                <option value="">Please select a user</option>
+            {{#each user}}
+                <option value="{{uid}}">{{uname}}</option>
+            {{/each}}
+            </select>
+			<br>
+			
+			<label for="uEdittscore">Test Score * </label>
+            <div>
+                <input id="uEdittscore" type="text" name="utscore" required pattern="^[\w- ']+$" />
+            </div>
+			
+			<label for="uEditdesc">Description *</label>
+            <div><textarea id="uEditdesc" name="udesc" pattern="^[\w- ',.!\r\n]+$"></textarea></div>
+
+            <br>
+            <input type="submit" value="Submit" />
+			
+        </form>
+</fieldset>
+
+<br>
+<fieldset id="userRmpanel">
+        <legend><b>Remove User</b></legend>
+        <form method="POST" action="/admin/api/user/remove">
+            <label for="Rmuname">User Name *</label><br>
+            <select id="Rmuname" name="uid" required>
+                <option value="">Please select a user</option>
+            {{#each user}}
+                <option value="{{uid}}">{{uname}}</option>
+            {{/each}}
+            </select>
+            <br><br>
+            <input type="submit" value="Submit" />
+        </form>
+</fieldset>
+
+<script type="text/javascript" src="/lib/admin-panel-user.js"></script>
