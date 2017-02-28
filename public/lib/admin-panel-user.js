@@ -45,36 +45,39 @@ function onSubmitHandler(e) {
 		});
 }
 
-function onSubmitImageHandler(e) {
-	e.preventDefault();
-	// Reference: http://visionmedia.github.io/superagent/#post-/%20put%20requests
-	// Disable default form submission to prevent page load
-	//var serialize = serializeFormData(this);
-	var formdata = new FormData(this);
-	
-	superagent
-		.post(this.getAttribute('action'))
-		.send(formdata)
-		.type(null)
-		.end(function (res) {
-			if (res.error) {
-				if (res.body.sessError) {
-					alert(res.body.sessError);
-					location.href = '/admin';
-				} else if (res.body.imageInputError) {
-					alert(res.body.imageInputError);
-				} else if (res.body.inputError) {
-					res.body.inputError.forEach(function(input){
-						alert(input.msg);
-					});	
-				} 
-				return console.error(res.error);
-			}
 
-			alert('OK');
-			// refresh the page with latest results
-			location.reload();
-		});
+function onChangeHandler(e) {
+	if (this.value != '') {
+		superagent
+			.post("/admin/api/user/edit")
+			.send(serializeFormData(this.parentNode))
+			.end(function (res) {
+				if (res.error) {
+					if (res.body.inputError) {
+						res.body.inputError.forEach(function(input){
+							alert(input.msg);
+						});
+					}
+					return console.error(res.body.inputError || res.error);
+				}
+				if (res.body.userEdit){
+					var cat = document.getElementById('uEditname');
+					for (var i = 0; i <= cat.options.length - 1; i++) {
+						if (res.body.userEdit[0].uid == cat.options[i].value) {
+							cat.options[i].selected = 'selected';
+							break;
+						}
+					}
+					document.getElementById('uEdittscore').value = res.body.userEdit[0].utscore;
+					document.getElementById('uEditdesc').innerHTML = res.body.userEdit[0].description;
+				}	
+			});	
+	} else {
+		document.getElementById('uEditname').options[0].selected = 'selected';
+		document.getElementById('uEdittscore').value = '';
+		document.getElementById('uEditdesc').innerHTML = '';
+		
+	}
 }
 
 
@@ -83,5 +86,7 @@ document.querySelector('#logout').addEventListener('submit', onSubmitHandler);
 document.querySelector('#userNewpanel form').addEventListener('submit', onSubmitHandler);
 document.querySelector('#userRmpanel form').addEventListener('submit', onSubmitHandler);
 document.querySelector('#userEditpanel form').addEventListener('submit', onSubmitHandler);
+
+document.querySelector('#uEditname').addEventListener('change', onChangeHandler);
 
 })();

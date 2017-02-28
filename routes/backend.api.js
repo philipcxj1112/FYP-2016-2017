@@ -611,6 +611,75 @@ app.post('/pic/:pid', function (req, res) {
 	);
 
 });
+//new
+app.post('/user/edit/update', function (req, res) {
+    req.checkBody('uid', 'Invalid User ID')
+		.notEmpty()
+		.isInt();		
+    req.checkBody('utscore', 'Invalid User Test Score Input')
+		.isLength(1, 512)
+		.matches(inputPattern.name);
+	req.checkBody('udesc', 'Invalid Description')
+		.isLength(1, 512)
+		.matches(inputPattern.description);
+
+	var errors = req.validationErrors();
+	if (errors) {
+		return res.status(400).json({'inputError': errors}).end();
+	}
+	pool.query('UPDATE User SET utscore = ?, description = ? WHERE uid = ?', 
+		[req.body.utscore, req.body.udesc, req.body.uid],
+		function (error, result) {
+			if (error) {
+				console.error(error);
+				return res.status(500).json({'dbError': 'check server log'}).end();
+			}
+			// construct an error body that conforms to the inputError format
+			if (result.affectedRows === 0) {
+				return res.status(400).json({'inputError': [{
+					param: 'uid', 
+					msg: 'Invalid User ID', 
+					value: req.body.uid
+				}]}).end();	
+			}
+			res.status(200).json({'UPdate': 'Sucess'}).end();
+	});
+});
+//new
+app.post('/user/edit', function (req, res) {
+    req.checkBody('uid', 'Invalid User ID')
+		.notEmpty()
+		.isInt();
+		
+    // quit processing if encountered an input validation error
+    var errors = req.validationErrors();
+    if (errors) {
+        return res.status(400).json({ 'inputError': errors }).end();
+    }
+
+    pool.query('SELECT * FROM User WHERE uid = (?)',
+		[req.body.uid],
+		function (error, result) {
+		    if (error) {
+		        console.error(error);
+		        return res.status(500).json({ 'dbError': 'check server log' }).end();
+		    }
+			
+			if (result.affectedRows === 0) {
+		        return res.status(400).json({
+		            'inputError': [{
+		                param: 'uid',
+		                msg: 'Invalid User ID',
+		                value: req.body.uid
+		            }]
+		        }).end();
+			
+			
+		    }
+		    res.status(200).json({'userEdit': result.rows}).end();
+		}
+	);
+});
 
 app.post('/user/:uid', function (req, res) {
 
@@ -713,39 +782,6 @@ app.get('/stat/:uid/:pid/:lid', function (req, res) {
 
 });
 
-
-//new added
-app.post('/result', function (req, res) {
-    req.checkBody('uid', 'Invalid User ID')
-		.notEmpty()
-		.isInt();
-
-    // quit processing if encountered an input validation error
-    var errors = req.validationErrors();
-    if (errors) {
-        return res.status(400).json({ 'inputError': errors }).end();
-    }
-
-    pool.query('SELECT * FROM User WHERE uid = (?)',
-		[req.body.uid],
-		function (error, result) {
-		    if (error) {
-		        console.error(error);
-		        return res.status(500).json({ 'dbError': 'check server log' }).end();
-		    }
-			
-			if (result.affectedRows === 0) {
-		        return res.status(400).json({
-		            'inputError': [{
-		                param: 'uid',
-		                msg: 'Invalid User ID',
-		                value: req.body.uid
-		            }]
-		        }).end();
-		    }
-		}
-	);
-});
 
 
 module.exports = app;
