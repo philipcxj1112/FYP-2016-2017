@@ -65,7 +65,16 @@ app.post('/user/add', function (req, res) {
     req.checkBody('uname', 'Invalid User Name')
 		.isLength(1, 512)
 		.matches(inputPattern.name);
-
+	req.checkBody('sid', 'Invalid User ID')
+		.isLength(1, 512)
+		.matches(inputPattern.name);
+    req.checkBody('utscore', 'Invalid User Test Score Input')
+		.isLength(1, 512)
+		.matches(inputPattern.name);
+	req.checkBody('udesc', 'Invalid Description')
+		.isLength(1, 512)
+		.matches(inputPattern.description);
+		
     // quit processing if encountered an input validation error
     var errors = req.validationErrors();
     if (errors) {
@@ -75,8 +84,8 @@ app.post('/user/add', function (req, res) {
     // manipulate the DB accordingly using prepared statement
     // (Prepared Statement := use ? as placeholder for values in sql statement;
     //   They'll automatically be replaced by the elements in next array)
-    pool.query('INSERT INTO User (pref, uname) VALUES (?, ?)',
-		[req.body.pref, req.body.uname],
+    pool.query('INSERT INTO User (pref, uname, sid, utscore, description) VALUES (?, ?, ?, ?, ?)',
+		[req.body.pref, req.body.uname, req.body.sid, req.body.utscore, req.body.udesc],
 		function (error, result) {
 		    if (error) {
 		        console.error(error);
@@ -602,6 +611,75 @@ app.post('/pic/:pid', function (req, res) {
 	);
 
 });
+//new
+app.post('/user/edit/update', function (req, res) {
+    req.checkBody('uid', 'Invalid User ID')
+		.notEmpty()
+		.isInt();		
+    req.checkBody('utscore', 'Invalid User Test Score Input')
+		.isLength(1, 512)
+		.matches(inputPattern.name);
+	req.checkBody('udesc', 'Invalid Description')
+		.isLength(1, 512)
+		.matches(inputPattern.description);
+
+	var errors = req.validationErrors();
+	if (errors) {
+		return res.status(400).json({'inputError': errors}).end();
+	}
+	pool.query('UPDATE User SET utscore = ?, description = ? WHERE uid = ?', 
+		[req.body.utscore, req.body.udesc, req.body.uid],
+		function (error, result) {
+			if (error) {
+				console.error(error);
+				return res.status(500).json({'dbError': 'check server log'}).end();
+			}
+			// construct an error body that conforms to the inputError format
+			if (result.affectedRows === 0) {
+				return res.status(400).json({'inputError': [{
+					param: 'uid', 
+					msg: 'Invalid User ID', 
+					value: req.body.uid
+				}]}).end();	
+			}
+			res.status(200).json({'UPdate': 'Sucess'}).end();
+	});
+});
+//new
+app.post('/user/edit', function (req, res) {
+    req.checkBody('uid', 'Invalid User ID')
+		.notEmpty()
+		.isInt();
+		
+    // quit processing if encountered an input validation error
+    var errors = req.validationErrors();
+    if (errors) {
+        return res.status(400).json({ 'inputError': errors }).end();
+    }
+
+    pool.query('SELECT * FROM User WHERE uid = (?)',
+		[req.body.uid],
+		function (error, result) {
+		    if (error) {
+		        console.error(error);
+		        return res.status(500).json({ 'dbError': 'check server log' }).end();
+		    }
+			
+			if (result.affectedRows === 0) {
+		        return res.status(400).json({
+		            'inputError': [{
+		                param: 'uid',
+		                msg: 'Invalid User ID',
+		                value: req.body.uid
+		            }]
+		        }).end();
+			
+			
+		    }
+		    res.status(200).json({'userEdit': result.rows}).end();
+		}
+	);
+});
 
 app.post('/user/:uid', function (req, res) {
 
@@ -670,8 +748,8 @@ app.get('/stat/:uid/:pid/:lid', function (req, res) {
     // manipulate the DB accordingly using prepared statement
     // (Prepared Statement := use ? as placeholder for values in sql statement;
     //   They'll automatically be replaced by the elements in next array)
-    pool.query('SELECT * FROM stat WHERE pid = (?) AND uid = (?) AND lid = (?)',
-		[req.params.pid, req.params.uid, req.params.lid],
+    pool.query('SELECT * FROM stat WHERE pid = (?) AND uid = (?) AND lid = (?) AND rdate = STR_TO_DATE(?, ?)',
+		[req.params.pid, req.params.uid, req.params.lid, currentdate, dformat],
 		function (error, result) {
 		    if (error) {
 		        console.error(error);
@@ -688,8 +766,8 @@ app.get('/stat/:uid/:pid/:lid', function (req, res) {
 					}
 				);
 		    } else {
-		        pool.query('UPDATE stat set count = count + 1 WHERE uid = (?) AND pid = (?) AND lid = (?)',
-					[req.params.uid, req.params.pid, req.params.lid],
+		        pool.query('UPDATE stat set count = count + 1 WHERE uid = (?) AND pid = (?) AND lid = (?) AND rdate = STR_TO_DATE(?, ?)',
+					[req.params.uid, req.params.pid, req.params.lid, currentdate, dformat],
 					function (error, update) {
 					    if (error) {
 					        console.error(error);
@@ -703,6 +781,7 @@ app.get('/stat/:uid/:pid/:lid', function (req, res) {
 	);
 
 });
+
 
 
 module.exports = app;

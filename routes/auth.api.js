@@ -56,9 +56,9 @@ app.use('/', function(req, res, next) {
 */
 app.get('/login', function (req, res) {
     if (req.session.admin)
-        return res.redirect('/admin');
+        return res.redirect('/admin/user');
     res.render('login', {
-        layout: 'admin',
+        layout: 'login',
         title: '2016 Final Year Project'
     });
 });

@@ -1,16 +1,49 @@
-#main{width:800px}
-.panel{float:left;width:350px;padding:5px}
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+}
 
-fieldset{width:310px}
-form label{clear:left;float:left;width:90px;line-height:23px}
-form div{padding:4px 0}
-form input[type=text],input[type=number],select,textarea{width:200px}
-form input[type=submit]{clear:both}
-#prodOrgImage{width:320px;}
-.hide{display:none}
-.clear{clear:both}
+li {
+    float: left;
+}
 
-#forgetpw {
-    font-size:11px;
-    color: #777;
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 20px;
+    text-decoration: none;
+    font-family:verdana;
+    font-size: 16px;
+}
+
+li a:hover {
+    background-color: #111;
+}
+
+li {
+    border-right: 1px solid #bbb;
+}
+
+li:last-child {
+    border-right: none;
+}
+.active {
+    background-color: #4CAF50;
+}
+.button {
+    background-color: #333;
+    border: none;
+    color: white;
+    padding: 14px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    font-family:verdana;
+    font-size: 16px;
+    margin: 0px 0px;
+    cursor: pointer;
 }

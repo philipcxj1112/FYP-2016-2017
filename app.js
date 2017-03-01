@@ -37,9 +37,9 @@ app.listen(process.env.PORT || 8080, function () {
     console.log('Example Server listening at port ' + (process.env.PORT || 8080));
 });
 */
-//app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || 3000);
 app.set('httpsport', 8080);
 
 
-//var httpServer = http.createServer(app).listen(app.get('port'));
+var httpServer = http.createServer(app).listen(app.get('port'));
 var httpsServer = https.createServer(ssl.options, app).listen(app.get('httpsport'));
