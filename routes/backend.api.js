@@ -26,7 +26,7 @@ var upload = multer({ storage: storage })
 
 //var upload = multer({ dest: 'public/uploads/' });
 
-var pool = anyDB.createPool('mysql://root:523422633@127.0.0.1/FYP2016', {
+var pool = anyDB.createPool('mysql://root:root@127.0.0.1/FYP', {
     min: 2, max: 20
 });
 var inputPattern = {
@@ -72,8 +72,8 @@ app.post('/user/add', function (req, res) {
         return res.status(400).json({ 'inputError': errors }).end();
     }
 
-    // manipulate the DB accordingly using prepared statement 
-    // (Prepared Statement := use ? as placeholder for values in sql statement; 
+    // manipulate the DB accordingly using prepared statement
+    // (Prepared Statement := use ? as placeholder for values in sql statement;
     //   They'll automatically be replaced by the elements in next array)
     pool.query('INSERT INTO User (pref, uname) VALUES (?, ?)',
 		[req.body.pref, req.body.uname],
@@ -95,7 +95,7 @@ app.post('/pic/location/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
     // Reference: https://www.npmjs.com/package/express-validator
     // Reference: https://github.com/chriso/validator.js
 	console.log(req.files);
-	
+
     req.checkBody('lid', 'Invalid Location ID')
 		.notEmpty()
 		.isInt();
@@ -110,7 +110,7 @@ app.post('/pic/location/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
     if (errors) {
         return res.status(400).json({ 'inputError': errors }).end();
     }
-	
+
 	if (!req.files) {
         return res.status(403).json({'InputError':'expect 2 file upload'}).end();
     }
@@ -124,17 +124,17 @@ app.post('/pic/location/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
     if (!/^audio\/(mp3|wma)$/i.test(upload.sound[0].mimetype)) {
         return res.status(403).json({'imageInputError':'expect sound file'}).end();
     }
-	
+
 	var imgurl = '/uploads/'+ req.files.img[0].originalname;
-	
+
 	var soundurl = '/uploads/' +req.files.sound[0].originalname;
-	
+
 	console.log(imgurl);
 	console.log(soundurl);
 	console.log(req.files);
-	
-    // manipulate the DB accordingly using prepared statement 
-    // (Prepared Statement := use ? as placeholder for values in sql statement; 
+
+    // manipulate the DB accordingly using prepared statement
+    // (Prepared Statement := use ? as placeholder for values in sql statement;
     //   They'll automatically be replaced by the elements in next array)
     pool.query('SELECT * FROM Location WHERE lid = (?)',
 		[req.body.lid],
@@ -167,7 +167,7 @@ app.post('/pic/location/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
 										if (error) {
 											console.error(error);
 											return res.status(500).json({ 'dbError': 'check server log' }).end();
-										}						
+										}
 										res.status(200).json(result).end();
 								});
 						});
@@ -185,7 +185,7 @@ app.post('/pic/personal/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
     // Reference: https://www.npmjs.com/package/express-validator
     // Reference: https://github.com/chriso/validator.js
 	//console.log(req.files.img);
-	
+
 
 
     req.checkBody('uid', 'Invalid User ID')
@@ -216,17 +216,17 @@ app.post('/pic/personal/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
     if (!/^audio\/(mp3|wma)$/i.test(upload.sound[0].mimetype)) {
         return res.status(403).json({'imageInputError':'expect audio file'}).end();
     }
-	
+
 	var imgurl = '/uploads/'+ req.files.img[0].originalname;
-	
+
 	var soundurl = '/uploads/' +req.files.sound[0].originalname;
-	
+
 	console.log(imgurl);
 	console.log(soundurl);
 	console.log(req.files);
 
-    // manipulate the DB accordingly using prepared statement 
-    // (Prepared Statement := use ? as placeholder for values in sql statement; 
+    // manipulate the DB accordingly using prepared statement
+    // (Prepared Statement := use ? as placeholder for values in sql statement;
     //   They'll automatically be replaced by the elements in next array)
     pool.query('SELECT * FROM Picture Where imgurl = (?) AND soundURL = (?)',
 		[imgurl, soundurl],
@@ -290,7 +290,7 @@ app.post('/pic/edit', function (req, res) {
 	if (errors) {
 		return res.status(400).json({'inputError': errors}).end();
 	}
-	pool.query('SELECT * FROM Picture WHERE pid = ?', 
+	pool.query('SELECT * FROM Picture WHERE pid = ?',
 		[req.body.pid],
 		function (error, result) {
 			if (error) {
@@ -300,10 +300,10 @@ app.post('/pic/edit', function (req, res) {
 			// construct an error body that conforms to the inputError format
 			if (result.affectedRows === 0) {
 				return res.status(400).json({'inputError': [{
-					param: 'pid', 
-					msg: 'Invalid Product ID', 
+					param: 'pid',
+					msg: 'Invalid Product ID',
 					value: req.body.pid
-				}]}).end();	
+				}]}).end();
 			}
 			res.status(200).json({'picEdit': result.rows}).end();
 	});
@@ -328,7 +328,7 @@ app.post('/pic/edit/update', function (req, res) {
 	if (errors) {
 		return res.status(400).json({'inputError': errors}).end();
 	}
-	pool.query('UPDATE Picture SET description = ?, pname = ? WHERE pid = ?', 
+	pool.query('UPDATE Picture SET description = ?, pname = ? WHERE pid = ?',
 		[req.body.lid, req.body.description, req.body.pname ,req.body.pid],
 		function (error, result) {
 			if (error) {
@@ -338,10 +338,10 @@ app.post('/pic/edit/update', function (req, res) {
 			// construct an error body that conforms to the inputError format
 			if (result.affectedRows === 0) {
 				return res.status(400).json({'inputError': [{
-					param: 'pid', 
-					msg: 'Invalid Product ID', 
+					param: 'pid',
+					msg: 'Invalid Product ID',
 					value: req.body.pid
-				}]}).end();	
+				}]}).end();
 			}
 			res.status(200).json({'UPdate': 'Sucess'}).end();
 	});
@@ -372,8 +372,8 @@ app.post('/location/add', function (req, res) {
         return res.status(400).json({ 'inputError': errors }).end();
     }
 
-    // manipulate the DB accordingly using prepared statement 
-    // (Prepared Statement := use ? as placeholder for values in sql statement; 
+    // manipulate the DB accordingly using prepared statement
+    // (Prepared Statement := use ? as placeholder for values in sql statement;
     //   They'll automatically be replaced by the elements in next array)
     pool.query('INSERT INTO Location (UUID, major, minor, lname) VALUES (?, ?, ?, ?)',
 		[req.body.UUID, req.body.major, req.body.minor, req.body.lname],
@@ -403,8 +403,8 @@ app.post('/pic/count', function (req, res) {
         return res.status(400).json({ 'inputError': errors }).end();
     }
 
-    // manipulate the DB accordingly using prepared statement 
-    // (Prepared Statement := use ? as placeholder for values in sql statement; 
+    // manipulate the DB accordingly using prepared statement
+    // (Prepared Statement := use ? as placeholder for values in sql statement;
     //   They'll automatically be replaced by the elements in next array)
     pool.query('SELECT COUNT(pid) FROM Picture',
 		[req.params.pid],
@@ -517,7 +517,7 @@ app.post('/user/remove', function (req, res) {
 		        console.error(error);
 		        return res.status(500).json({ 'dbError': 'check server log' }).end();
 		    }
-			
+
 			if (result.affectedRows === 0) {
 		        return res.status(400).json({
 		            'inputError': [{
@@ -527,7 +527,7 @@ app.post('/user/remove', function (req, res) {
 		            }]
 		        }).end();
 		    }
-			
+
 			pool.query('DELETE FROM UPrelation WHERE uid = ? ',
 				[req.body.uid],
 				function (error, result) {
@@ -587,8 +587,8 @@ app.post('/pic/:pid', function (req, res) {
         return res.status(400).json({ 'inputError': errors }).end();
     }
 
-    // manipulate the DB accordingly using prepared statement 
-    // (Prepared Statement := use ? as placeholder for values in sql statement; 
+    // manipulate the DB accordingly using prepared statement
+    // (Prepared Statement := use ? as placeholder for values in sql statement;
     //   They'll automatically be replaced by the elements in next array)
     pool.query('SELECT * FROM Picture WHERE pid = (?)',
 		[req.params.pid],
@@ -616,8 +616,8 @@ app.post('/user/:uid', function (req, res) {
         return res.status(400).json({ 'inputError': errors }).end();
     }
 
-    // manipulate the DB accordingly using prepared statement 
-    // (Prepared Statement := use ? as placeholder for values in sql statement; 
+    // manipulate the DB accordingly using prepared statement
+    // (Prepared Statement := use ? as placeholder for values in sql statement;
     //   They'll automatically be replaced by the elements in next array)
     pool.query('SELECT * FROM User WHERE uid = (?)',
 		[req.params.uid],
@@ -648,7 +648,7 @@ app.get('/stat/:uid/:pid/:lid', function (req, res) {
     // Reference: https://github.com/chriso/validator.js
 
     // quit processing if encountered an input validation error
-	
+
 	var date  = new Date();
     var year = date.getFullYear();
 
@@ -657,18 +657,18 @@ app.get('/stat/:uid/:pid/:lid', function (req, res) {
 
     var day  = date.getDate();
     day = (day < 10 ? "0" : "") + day;
-	
+
 	var currentdate = day+'/'+month+'/'+year;
 	var dformat = '%d/%m/%Y';
-	
+
 
     var errors = req.validationErrors();
     if (errors) {
         return res.status(400).json({ 'inputError': errors }).end();
     }
 
-    // manipulate the DB accordingly using prepared statement 
-    // (Prepared Statement := use ? as placeholder for values in sql statement; 
+    // manipulate the DB accordingly using prepared statement
+    // (Prepared Statement := use ? as placeholder for values in sql statement;
     //   They'll automatically be replaced by the elements in next array)
     pool.query('SELECT * FROM stat WHERE pid = (?) AND uid = (?) AND lid = (?)',
 		[req.params.pid, req.params.uid, req.params.lid],
