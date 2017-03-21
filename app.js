@@ -7,7 +7,7 @@ var express = require('express'),
 
 
 	authAPIRouter = require('./routes/auth.api.js'),
-//    frontEndRouter = require('./routes/frontend.js'),
+    appRouter = require('./routes/app.request.js'),
     backEndRouter = require('./routes/backend.js'),
     backEndAPIRouter = require('./routes/backend.api.js');
 
@@ -23,6 +23,9 @@ app.set('view engine', 'handlebars');
 // serve static files from the public folder
 app.use(express.static(__dirname + '/public'));
 
+//for basic app requests without authentication
+app.use('/app/api', appRouter);
+
 // backend routers run first
 app.use('/admin', authAPIRouter);
 
@@ -37,9 +40,9 @@ app.listen(process.env.PORT || 8080, function () {
     console.log('Example Server listening at port ' + (process.env.PORT || 8080));
 });
 */
-app.set('port', process.env.PORT || 3000);
+//app.set('port', process.env.PORT || 3000);
 app.set('httpsport', 8080);
 
 
-var httpServer = http.createServer(app).listen(app.get('port'));
+//var httpServer = http.createServer(app).listen(app.get('port'));
 var httpsServer = https.createServer(ssl.options, app).listen(app.get('httpsport'));
