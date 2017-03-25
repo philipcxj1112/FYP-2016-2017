@@ -20,11 +20,7 @@
   "bugs": {
     "url": "https://github.com/philipcxj1112/FYP-2016-2017/issues"
   },
-<<<<<<< HEAD
   "homepage": "https://github.com/philipcxj1112/FYP-2016-2017#readme"
-=======
-  "homepage": "https://github.com/philipcxj1112/FYP-2016-2017#readme",
->>>>>>> 49b452a6bec7eace6c7d1b56a5292e71de986ac5
   "dependencies": {
     "any-db": "^2.1.0",
     "any-db-mysql": "^2.1.2",
