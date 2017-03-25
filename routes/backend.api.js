@@ -825,7 +825,6 @@ app.post('/result', function (req, res) {
 				imageStream.pipe(fileStream);
 			});
 			res.status(200).json({ status: 'Sucess' }).end();
-			
 		}
 	);
 	

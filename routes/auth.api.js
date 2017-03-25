@@ -7,7 +7,7 @@ var express = require('express'),
 //	csrf = require('csurf'),
 	cookieParser = require('cookie-parser');
 
-var pool = anyDB.createPool('mysql://root:523422633@127.0.0.1/FYP2016', {
+	var pool = anyDB.createPool('mysql://root:root@127.0.0.1/FYP', {
     min: 2, max: 20
 });
 
@@ -47,10 +47,10 @@ app.use(session({
 app.use('/', function(req, res, next) {
 	var schema = req.headers['x-forwarded-proto'];
 	if (schema === 'https') {
-		next(); 
+		next();
 	}
 	else {
-		res.redirect('https://' + req.headers.host + req.originalUrl); 
+		res.redirect('https://' + req.headers.host + req.originalUrl);
 	}
 });
 */

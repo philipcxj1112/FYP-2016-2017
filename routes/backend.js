@@ -5,8 +5,13 @@ var cookieParser = require('cookie-parser');
 
 var app = express.Router();
 
+<<<<<<< HEAD
+var pool = anyDB.createPool('mysql://root:root@127.0.0.1/FYP', {
+	min: 2, max: 10
+=======
 var pool = anyDB.createPool('mysql://root:523422633@127.0.0.1/FYP2016', {
     min: 2, max: 10
+>>>>>>> e7f37098a4feaa782a9b87095e6c16c9fdb25b7c
 });
 
 //var csrfProtection = csrf({ cookie: true });
@@ -98,6 +103,9 @@ app.get('/pic', function (req, res) {
     });
 });
 
+<<<<<<< HEAD
+module.exports = app;
+=======
 // URL expected: http://hostname/admin/result
 app.get('/result', function (req, res) {
     // async fetch data from SQL, render page when ready
@@ -126,3 +134,4 @@ app.get('/result', function (req, res) {
 
 
 module.exports = app;
+>>>>>>> e7f37098a4feaa782a9b87095e6c16c9fdb25b7c
