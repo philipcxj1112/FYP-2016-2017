@@ -109,10 +109,10 @@ function onChangeHandler(e) {
 				}	
 			});	
 	} else {
-		document.getElementById('prodEditCatId').options[0].selected = 'selected';
-		document.getElementById('prodEditName').value = '';
-		document.getElementById('prodEditPrice').value = '';
-		document.getElementById('prodEditDescription').innerHTML = '';
+		document.getElementById('pEditImagelist').options[0].selected = 'selected';
+		document.getElementById('pEditName').value = '';
+		document.getElementById('pEditlid').options[0].selected = 'selected';
+		document.getElementById('pEditdesc').innerHTML = '';
 
 		var removeImage = document.getElementById('prodOrgImage');
 		removeImage.parentNode.removeChild(removeImage);

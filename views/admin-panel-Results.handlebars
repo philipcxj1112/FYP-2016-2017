@@ -5,18 +5,40 @@
   <li><a href="/admin/pic">Update Picture</a></li>
   <li><a href="/admin/loc">Update Location</a></li>
   <li><a class="active" href="/admin/result">Analytic Results</a></li>
-  <li style="float:right"><input type="submit" class="button" id="logout" method="POST" action="/admin/api/logout"/ value="Logout"></li>
+  <li style="float:right">
+  <form id="logout" method="POST" action="/admin/api/logout">
+    <input type="submit" class="button" id="logout" method="POST" action="/admin/api/logout" value="Logout"/>
+</form>
+</li>
 </ul>
 
 <br>
 
 <fieldset id="Resultpanel">
 <legend><b>Select User</b></legend>
+		<form method="POST" action="/admin/api/result" > 
             <label for="Sluname">User Name *</label>
+			<br>
             <select id="Sluname" name="uid" required>
                 <option value="">Please select a user</option>
             {{#each user}}
                 <option value="{{uid}}">{{uname}}</option>
-            {{/each}}
-</select>
+            {{/each}}	
+            </select>
+			<br>
+			<select id="Weekday" name="weekofday" required>
+				<option value="">Please select a weekday</option>
+				<option value="1">Sunday</option>
+				<option value="2">Monday</option>
+				<option value="3">Tuesday</option>
+				<option value="4">Wednesday</option>
+				<option value="5">Thursday</option>
+				<option value="6">Friday</option>
+				<option value="7">Saturday</option>
+            </select>
+            <input type="submit" value="Submit" />
+			<div id = "Graph"></div>
+		</form>
 </fieldset>
+
+<script type="text/javascript" src="/lib/admin-panel-result.js"></script>

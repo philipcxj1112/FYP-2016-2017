@@ -44,44 +44,50 @@ function onSubmitHandler(e) {
 			location.reload();
 		});
 }
-
-function onSubmitImageHandler(e) {
-	e.preventDefault();
-	// Reference: http://visionmedia.github.io/superagent/#post-/%20put%20requests
-	// Disable default form submission to prevent page load
-	//var serialize = serializeFormData(this);
-	var formdata = new FormData(this);
-	
-	superagent
-		.post(this.getAttribute('action'))
-		.send(formdata)
-		.type(null)
-		.end(function (res) {
-			if (res.error) {
-				if (res.body.sessError) {
-					alert(res.body.sessError);
-					location.href = '/admin';
-				} else if (res.body.imageInputError) {
-					alert(res.body.imageInputError);
-				} else if (res.body.inputError) {
-					res.body.inputError.forEach(function(input){
-						alert(input.msg);
-					});	
-				} 
-				return console.error(res.error);
-			}
-
-			alert('OK');
-			// refresh the page with latest results
-			location.reload();
-		});
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
 }
 
 
 
+function onChangeHandler(e) {
+	e.preventDefault();
+	// Reference: http://visionmedia.github.io/superagent/#post-/%20put%20requests
+	// Disable default form submission to prevent page load
+	var serialize = serializeFormData(this);
+
+		superagent
+			.post(this.getAttribute('action'))
+			.send(serialize)
+			.end(function (res) {
+				if (res.error) {
+					if (res.body.inputError) {
+						res.body.inputError.forEach(function(input){
+							alert(input.msg);
+						});
+					}
+					return console.error(res.body.inputError || res.error);
+				}
+				if (res.body.status){
+					sleep(3000);
+					var blankImage = document.createElement("img");
+					blankImage.id = 'GraphGen';
+					document.getElementById('Graph').appendChild(blankImage);
+					document.getElementById('GraphGen').src = '../graph/plotly.png';
+				}	
+			});	
+
+}
+
+
 document.querySelector('#logout').addEventListener('submit', onSubmitHandler);
 
-document.querySelector('#locNewpanel form').addEventListener('submit', onSubmitHandler);
-document.querySelector('#locRmpanel form').addEventListener('submit', onSubmitHandler);
+document.querySelector('#Resultpanel  form').addEventListener('submit', onChangeHandler);
 
+//document.querySelector('#Sluname').addEventListener('change', onChangeHandler);
 })();

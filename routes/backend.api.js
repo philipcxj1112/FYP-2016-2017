@@ -7,9 +7,8 @@ var cookieParser = require('cookie-parser');
 //var csrf = require('csurf');
 var fs = require('fs');
 var multer = require('multer');
-//var AWS = require('aws-sdk');
-//var host = '192.168.26.128:8080'
-
+var plotly = require('plotly')("philipcxj", "DtSALEZYkCYirIVEfWHu")
+var dateFormat = require('dateformat');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -344,6 +343,7 @@ app.post('/pic/edit/update', function (req, res) {
 				console.error(error);
 				return res.status(500).json({'dbError': 'check server log'}).end();
 			}
+			console.log(result);
 			// construct an error body that conforms to the inputError format
 			if (result.affectedRows === 0) {
 				return res.status(400).json({'inputError': [{
@@ -726,18 +726,10 @@ app.get('/stat/:uid/:pid/:lid', function (req, res) {
     // Reference: https://github.com/chriso/validator.js
 
     // quit processing if encountered an input validation error
-	
-	var date  = new Date();
-    var year = date.getFullYear();
+    var now = new Date();
+	var currentdate=dateFormat(now, "dd/mm/yyyy HH:MM:ss");
 
-    var month = date.getMonth() + 1;
-    month = (month < 10 ? "0" : "") + month;
-
-    var day  = date.getDate();
-    day = (day < 10 ? "0" : "") + day;
-	
-	var currentdate = day+'/'+month+'/'+year;
-	var dformat = '%d/%m/%Y';
+	var dformat = '%d/%m/%Y %H:%i:%s';
 	
 
     var errors = req.validationErrors();
@@ -780,6 +772,65 @@ app.get('/stat/:uid/:pid/:lid', function (req, res) {
 		}
 	);
 
+});
+
+
+app.post('/result', function (req, res) {
+	
+	req.checkBody('uid', 'Invalid User ID')
+		.notEmpty()
+		.isInt();
+	req.checkBody('weekofday', 'Invalid User ID')
+		.notEmpty()
+		.isInt();
+		
+    // quit processing if encountered an input validation error
+    var errors = req.validationErrors();
+    if (errors) {
+        return res.status(400).json({ 'inputError': errors }).end();
+    }
+	
+	
+	pool.query('SELECT TIME(t2.start_time) AS time, IFNULL(temp.tcount, 0) AS count FROM timetable t2 LEFT JOIN (SELECT TIME(t.start_time) AS time, COUNT(*) AS tcount FROM timetable t, stat s WHERE s.rdate >= CURDATE() - INTERVAL 1 WEEK AND DAYOFWEEK(rdate) = (?) AND TIME(s.rdate) BETWEEN TIME(t.start_time) AND time(t.end_time) AND s.uid = (?) GROUP BY t.start_time) AS temp ON temp.time = TIME(t2.start_time);', 
+		[req.body.weekofday, req.body.uid],
+		function (error, result) {
+			if (error) {
+		        console.error(error);
+		        return res.status(500).json({ 'dbError': 'check server log' }).end();
+		    }
+			console.log(result.rows);
+			var trace1 = {
+				x: [],
+				y: [],
+				type: "scatter"
+			};
+			
+			for(var i = 0; i < result.rowCount; i++){
+				trace1.x[i] = result.rows[i].time;
+				trace1.y[i] = result.rows[i].count;
+			}
+	
+			var figure = { 'data': [trace1] };
+
+			var imgOpts = {
+				format: 'png',
+				width: 1000,
+				height: 500
+			};
+
+			plotly.getImage(figure, imgOpts, function (error, imageStream) {
+				if (error) return console.log (error);
+
+				var fileStream = fs.createWriteStream('./public/graph/plotly.png');
+				imageStream.pipe(fileStream);
+			});
+			res.status(200).json({ status: 'Sucess' }).end();
+			
+		}
+	);
+	
+
+	
 });
 
 
