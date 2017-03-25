@@ -114,11 +114,19 @@ app.get('/result', function (req, res) {
                 res.status(500).end();
                 return;
             }
-            res.render('admin-panel-Results', {
-                layout: 'admin',
-                title: '2016 Final Year Project',
-                user: user.rows,
-                type: type.rows
+			    pool.query('SELECT * FROM Location', function (error, loc) {
+		            if (error) {
+						console.error(error);
+						res.status(500).end();
+						return;
+					}
+					res.render('admin-panel-Results', {
+						layout: 'admin',
+						title: '2016 Final Year Project',
+						user: user.rows,
+						type: type.rows,
+						loc: loc.rows
+				});
             });
         });
     });

@@ -74,11 +74,23 @@ function onChangeHandler(e) {
 					return console.error(res.body.inputError || res.error);
 				}
 				if (res.body.status){
-					sleep(3000);
-					var blankImage = document.createElement("img");
-					blankImage.id = 'GraphGen';
-					document.getElementById('Graph').appendChild(blankImage);
-					document.getElementById('GraphGen').src = '../graph/plotly.png';
+					var temp = document.getElementById('GraphGen');
+					if(!temp){
+						sleep(2000);
+						var blankImage = document.createElement("img");
+						blankImage.id = 'GraphGen';
+						document.getElementById('Graph').appendChild(blankImage);
+						document.getElementById('GraphGen').src = '../graph/plotly.png';
+					}
+					else{
+						//document.getElementById('Graph').removeChild(document.getElementById('GraphGen'));
+
+						//var blankImage = document.createElement("img");
+						//blankImage.id = 'GraphGen';
+						//document.getElementById('Graph').appendChild(blankImage);
+						sleep(2000);
+						document.getElementById('GraphGen').src = '../graph/plotly.png?'+ new Date().getTime();
+					}
 				}	
 			});	
 

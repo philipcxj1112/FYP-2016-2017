@@ -36,6 +36,13 @@
 				<option value="6">Friday</option>
 				<option value="7">Saturday</option>
             </select>
+			<br>
+			<select id="lname" name="lid" required>
+                <option value="">Please select a location</option>
+            {{#each loc}}
+                <option value="{{lid}}">{{lname}}</option>
+            {{/each}}
+            </select>
             <input type="submit" value="Submit" />
 			<div id = "Graph"></div>
 		</form>

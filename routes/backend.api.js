@@ -783,6 +783,9 @@ app.post('/result', function (req, res) {
 	req.checkBody('weekofday', 'Invalid User ID')
 		.notEmpty()
 		.isInt();
+	req.checkBody('lid', 'Invalid User ID')
+		.notEmpty()
+		.isInt();
 		
     // quit processing if encountered an input validation error
     var errors = req.validationErrors();
@@ -791,8 +794,8 @@ app.post('/result', function (req, res) {
     }
 	
 	
-	pool.query('SELECT TIME(t2.start_time) AS time, IFNULL(temp.tcount, 0) AS count FROM timetable t2 LEFT JOIN (SELECT TIME(t.start_time) AS time, COUNT(*) AS tcount FROM timetable t, stat s WHERE s.rdate >= CURDATE() - INTERVAL 1 WEEK AND DAYOFWEEK(rdate) = (?) AND TIME(s.rdate) BETWEEN TIME(t.start_time) AND time(t.end_time) AND s.uid = (?) GROUP BY t.start_time) AS temp ON temp.time = TIME(t2.start_time);', 
-		[req.body.weekofday, req.body.uid],
+	pool.query('SELECT TIME(t2.start_time) AS time, IFNULL(temp.tcount, 0) AS count FROM timetable t2 LEFT JOIN (SELECT TIME(t.start_time) AS time, COUNT(*) AS tcount FROM timetable t, stat s WHERE s.rdate >= CURDATE() - INTERVAL 1 WEEK AND DAYOFWEEK(rdate) = (?) AND TIME(s.rdate) BETWEEN TIME(t.start_time) AND time(t.end_time) AND s.uid = (?) AND s.lid = (?) GROUP BY t.start_time) AS temp ON temp.time = TIME(t2.start_time);', 
+		[req.body.weekofday, req.body.uid, req.body.lid],
 		function (error, result) {
 			if (error) {
 		        console.error(error);
