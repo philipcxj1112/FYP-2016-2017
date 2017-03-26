@@ -127,7 +127,7 @@ app.post('/user/:uid', function (req, res) {
 
 });
 
-app.post('/loc/:lid', function (req, res) {
+app.post('/loc/:UUID/:major/:minor', function (req, res) {
 	
 	var errors = req.validationErrors();
     if (errors) {
@@ -137,15 +137,15 @@ app.post('/loc/:lid', function (req, res) {
 	// manipulate the DB accordingly using prepared statement 
     // (Prepared Statement := use ? as placeholder for values in sql statement; 
     //   They'll automatically be replaced by the elements in next array)
-    pool.query('SELECT * FROM Location WHERE lid = (?)',
-		[req.params.lid],
+    pool.query('SELECT * FROM Location WHERE UUID = (?) AND major = (?) AND minor = (?)',
+		[req.params.UUID, req.params.major, req.params.minor],
 		function (error, result) {
 		    if (error) {
 		        console.error(error);
 		        return res.status(500).json({ 'dbError': 'check server log' }).end();
 		    }
 		    pool.query('SELECT * FROM PLrelation l, Picture p  WHERE lid = (?) AND l.pid = p.pid',
-				[req.params.lid],
+				[result.rows[0].lid],
 				function (error, relateion) {
 				    if (error) {
 				        console.error(error);
