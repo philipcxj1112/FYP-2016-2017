@@ -583,34 +583,7 @@ app.post('/pic/remove', function (req, res) {
 });
 
 
-app.post('/pic/:pid', function (req, res) {
 
-    // put your input validations and/or sanitizations here
-    // Reference: https://www.npmjs.com/package/express-validator
-    // Reference: https://github.com/chriso/validator.js
-
-    // quit processing if encountered an input validation error
-
-    var errors = req.validationErrors();
-    if (errors) {
-        return res.status(400).json({ 'inputError': errors }).end();
-    }
-
-    // manipulate the DB accordingly using prepared statement 
-    // (Prepared Statement := use ? as placeholder for values in sql statement; 
-    //   They'll automatically be replaced by the elements in next array)
-    pool.query('SELECT * FROM Picture WHERE pid = (?)',
-		[req.params.pid],
-		function (error, result) {
-		    if (error) {
-		        console.error(error);
-		        return res.status(500).json({ 'dbError': 'check server log' }).end();
-		    }
-		    res.status(200).json({ 'Picture': result.rows }).end();
-		}
-	);
-
-});
 //new
 app.post('/user/edit/update', function (req, res) {
     req.checkBody('uid', 'Invalid User ID')
@@ -680,100 +653,6 @@ app.post('/user/edit', function (req, res) {
 		}
 	);
 });
-
-app.post('/user/:uid', function (req, res) {
-
-    // put your input validations and/or sanitizations here
-    // Reference: https://www.npmjs.com/package/express-validator
-    // Reference: https://github.com/chriso/validator.js
-
-    // quit processing if encountered an input validation error
-
-    var errors = req.validationErrors();
-    if (errors) {
-        return res.status(400).json({ 'inputError': errors }).end();
-    }
-
-    // manipulate the DB accordingly using prepared statement 
-    // (Prepared Statement := use ? as placeholder for values in sql statement; 
-    //   They'll automatically be replaced by the elements in next array)
-    pool.query('SELECT * FROM User WHERE uid = (?)',
-		[req.params.uid],
-		function (error, result) {
-		    if (error) {
-		        console.error(error);
-		        return res.status(500).json({ 'dbError': 'check server log' }).end();
-		    }
-		    pool.query('SELECT pid FROM Picture WHERE uid = (?)',
-				[req.params.uid],
-				function (error, user) {
-				    if (error) {
-				        console.error(error);
-				        return res.status(500).json({ 'dbError': 'check server log' }).end();
-				    }
-				    //res.status(500).json({'dbError': 'check server log'}).end();
-				    res.status(200).json({ 'User': result.rows, 'Personal': user.rows }).end();
-				}
-			);
-		});
-
-});
-
-app.get('/stat/:uid/:pid/:lid', function (req, res) {
-
-    // put your input validations and/or sanitizations here
-    // Reference: https://www.npmjs.com/package/express-validator
-    // Reference: https://github.com/chriso/validator.js
-
-    // quit processing if encountered an input validation error
-    var now = new Date();
-	var currentdate=dateFormat(now, "dd/mm/yyyy HH:MM:ss");
-
-	var dformat = '%d/%m/%Y %H:%i:%s';
-	
-
-    var errors = req.validationErrors();
-    if (errors) {
-        return res.status(400).json({ 'inputError': errors }).end();
-    }
-
-    // manipulate the DB accordingly using prepared statement 
-    // (Prepared Statement := use ? as placeholder for values in sql statement; 
-    //   They'll automatically be replaced by the elements in next array)
-    pool.query('SELECT * FROM stat WHERE pid = (?) AND uid = (?) AND lid = (?) AND rdate = STR_TO_DATE(?, ?)',
-		[req.params.pid, req.params.uid, req.params.lid, currentdate, dformat],
-		function (error, result) {
-		    if (error) {
-		        console.error(error);
-		        return res.status(500).json({ 'dbError': 'check server log' }).end();
-		    }
-		    if (result.rowCount == 0) {
-		        pool.query('INSERT INTO stat (uid, pid, lid, count, rdate) VALUES (?, ?, ?, 1, STR_TO_DATE(?, ?))',
-					[req.params.uid, req.params.pid, req.params.lid, currentdate, dformat],
-					function (error, insert) {
-					    if (error) {
-					        console.error(error);
-					        return res.status(500).json({ 'dbError': 'check server log' }).end();
-					    }
-					}
-				);
-		    } else {
-		        pool.query('UPDATE stat set count = count + 1 WHERE uid = (?) AND pid = (?) AND lid = (?) AND rdate = STR_TO_DATE(?, ?)',
-					[req.params.uid, req.params.pid, req.params.lid, currentdate, dformat],
-					function (error, update) {
-					    if (error) {
-					        console.error(error);
-					        return res.status(500).json({ 'dbError': 'check server log' }).end();
-					    }
-					}
-				);
-		    }
-		    res.status(200).json({ 'Update Sucess!': 'yes' }).end();
-		}
-	);
-
-});
-
 
 app.post('/result', function (req, res) {
 	
