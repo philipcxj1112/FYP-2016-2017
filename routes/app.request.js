@@ -187,4 +187,23 @@ app.post('/pic/:pid', function (req, res) {
 
 });
 
+app.post('/test/:uid', function(req, res){
+	var now = new Date();
+	var currentdate=dateFormat(now, "dd/mm/yyyy HH:MM:ss");
+
+	var dformat = '%d/%m/%Y %H:%i:%s';
+	
+	pool.query('INSERT INTO test (uid, tdate) VALUES (?), STR_TO_DATE(?, ?)',
+		[req.params.uid, currentdate, dformat],
+		function (error, result) {
+		    if (error) {
+		        console.error(error);
+		        return res.status(500).json({ 'dbError': 'check server log' }).end();
+		    }
+		    res.status(200).json({ status: 'Sucess' }).end();
+		}
+	);
+	
+});
+
 module.exports = app;
