@@ -132,5 +132,15 @@ app.get('/result', function (req, res) {
     });
 });
 
+app.get('/beacon', function (req, res) {
+    // async fetch data from SQL, render page when ready
+
+    res.render('admin-panel-Beacon', {
+        layout: 'admin',
+        title: '2016 Final Year Project'
+    });
+            
+});
+
 
 module.exports = app;

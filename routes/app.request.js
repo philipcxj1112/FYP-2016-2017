@@ -15,9 +15,9 @@ var pool = anyDB.createPool('mysql://root:523422633@127.0.0.1/FYP2016', {
 });
 
 var inputPattern = {
-    name: /^[\w- ']+$/,
+    name: /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/,
     price: /^\d+(?:\.\d{1,2})?$/,
-    description: /^[\w- ',.!\r\n]+$/,
+    description: /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/,
     URL: /^[\w- ',.!:\/\r\n]+$/,
 };
 
@@ -89,7 +89,7 @@ app.post('/stat/:uid/:pid/:lid', function (req, res) {
 });
 
 
-app.post('/user/:uid', function (req, res) {
+app.post('/user/:sid', function (req, res) {
 
     // put your input validations and/or sanitizations here
     // Reference: https://www.npmjs.com/package/express-validator
@@ -105,15 +105,15 @@ app.post('/user/:uid', function (req, res) {
     // manipulate the DB accordingly using prepared statement 
     // (Prepared Statement := use ? as placeholder for values in sql statement; 
     //   They'll automatically be replaced by the elements in next array)
-    pool.query('SELECT * FROM User WHERE uid = (?)',
-		[req.params.uid],
+    pool.query('SELECT * FROM User WHERE sid = (?)',
+		[req.params.sid],
 		function (error, result) {
 		    if (error) {
 		        console.error(error);
 		        return res.status(500).json({ 'dbError': 'check server log' }).end();
 		    }
 		    pool.query('SELECT * FROM UPrelation u, Picture p  WHERE uid = (?) AND u.pid = p.pid',
-				[req.params.uid],
+				[result.rows[0].uid],
 				function (error, relateion) {
 				    if (error) {
 				        console.error(error);

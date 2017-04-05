@@ -102,10 +102,17 @@ function onChangeHandler(e) {
 					}
 					document.getElementById('pEditName').value = res.body.picEdit[0].pname;
 					document.getElementById('pEditdesc').innerHTML = res.body.picEdit[0].description;
-					var blankImage = document.createElement("img");
-					blankImage.id = 'prodOrgImage';
-					document.getElementById('OrgPicture').appendChild(blankImage);
-					document.getElementById('prodOrgImage').src = '..' + res.body.picEdit[0].imgurl;
+					var temp = document.getElementById('prodOrgImage');
+					if(!temp){
+						var blankImage = document.createElement("img");
+						blankImage.style.height = '200px';
+    					blankImage.style.width = '200px';
+						blankImage.id = 'prodOrgImage';
+						document.getElementById('OrgPicture').appendChild(blankImage);
+						document.getElementById('prodOrgImage').src = '..' + res.body.picEdit[0].imgurl;
+					}else{
+						document.getElementById('prodOrgImage').src = '..' + res.body.picEdit[0].imgurl;
+					}
 				}	
 			});	
 	} else {
@@ -124,6 +131,7 @@ function onChangeHandler(e) {
 document.querySelector('#logout').addEventListener('submit', onSubmitHandler);
 
 document.querySelector('#picRmpanel form').addEventListener('submit', onSubmitHandler);
+document.querySelector('#picEditpanel form').addEventListener('submit', onSubmitHandler);
 
 document.querySelector('#piclocNewpanel  form').addEventListener('submit', onSubmitImageHandler);
 document.querySelector('#picuserNewpanel  form').addEventListener('submit', onSubmitImageHandler);

@@ -82,17 +82,13 @@ function onChangeHandler(e) {
 						document.getElementById('Graph').appendChild(blankImage);
 						document.getElementById('GraphGen').src = '../graph/plotly.png';
 					}
-					else{
-						//document.getElementById('Graph').removeChild(document.getElementById('GraphGen'));
-
-						//var blankImage = document.createElement("img");
-						//blankImage.id = 'GraphGen';
-						//document.getElementById('Graph').appendChild(blankImage);
+					else{			
 						sleep(2000);
-						document.getElementById('GraphGen').src = '../graph/plotly.png?'+ new Date().getTime();
-					}
+						document.getElementById('GraphGen').src = '../graph/plotly.png?' + new Date().getTime();						
+					
 				}	
-			});	
+			}
+		});	
 
 }
 

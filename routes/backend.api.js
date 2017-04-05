@@ -29,9 +29,9 @@ var pool = anyDB.createPool('mysql://root:523422633@127.0.0.1/FYP2016', {
     min: 2, max: 20
 });
 var inputPattern = {
-    name: /^[\w- ']+$/,
+    name: /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/,
     price: /^\d+(?:\.\d{1,2})?$/,
-    description: /^[\w- ',.!\r\n]+$/,
+    description: /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/,
     URL: /^[\w- ',.!:\/\r\n]+$/,
 };
 
@@ -337,7 +337,7 @@ app.post('/pic/edit/update', function (req, res) {
 		return res.status(400).json({'inputError': errors}).end();
 	}
 	pool.query('UPDATE Picture SET description = ?, pname = ? WHERE pid = ?', 
-		[req.body.lid, req.body.description, req.body.pname ,req.body.pid],
+		[req.body.description, req.body.pname ,req.body.pid],
 		function (error, result) {
 			if (error) {
 				console.error(error);
@@ -349,10 +349,26 @@ app.post('/pic/edit/update', function (req, res) {
 				return res.status(400).json({'inputError': [{
 					param: 'pid', 
 					msg: 'Invalid Product ID', 
-					value: req.body.pid
+					pid: req.body.pid,
+					description:req.body.description, 
+					pname: req.body.pname
 				}]}).end();	
 			}
-			res.status(200).json({'UPdate': 'Sucess'}).end();
+			pool.query('UPDATE PLrelation SET lid = ? WHERE pid = ?', 
+				[req.body.lid ,req.body.pid],
+				function (error, pl) {
+
+					// construct an error body that conforms to the inputError format
+					if (pl.affectedRows === 0) {
+						return res.status(400).json({'inputError': [{
+							param: 'pid', 
+							msg: 'Invalid Product ID', 
+							pid: req.body.pid,
+							lid: req.body.lid
+						}]}).end();	
+					}
+					res.status(200).json({'UPdate': 'Sucess'}).end();
+			});
 	});
 });
 
@@ -659,9 +675,6 @@ app.post('/result', function (req, res) {
 	req.checkBody('uid', 'Invalid User ID')
 		.notEmpty()
 		.isInt();
-   req.checkBody('date', 'Invalid Picture Name')
-		.isLength(1, 512)
-		.matches(inputPattern.name);
 	req.checkBody('lid', 'Invalid User ID')
 		.notEmpty()
 		.isInt();
