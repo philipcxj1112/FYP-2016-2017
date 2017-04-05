@@ -5,7 +5,7 @@ var cookieParser = require('cookie-parser');
 
 var app = express.Router();
 
-var pool = anyDB.createPool('mysql://root:523422633@127.0.0.1/FYP2016', {
+var pool = anyDB.createPool('mysql://root:root@127.0.0.1/FYP', {
     min: 2, max: 10
 });
 
@@ -139,7 +139,7 @@ app.get('/beacon', function (req, res) {
         layout: 'admin',
         title: '2016 Final Year Project'
     });
-            
+
 });
 
 
