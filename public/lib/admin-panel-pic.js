@@ -131,7 +131,6 @@ function onChangeHandler(e) {
 document.querySelector('#logout').addEventListener('submit', onSubmitHandler);
 
 document.querySelector('#picRmpanel form').addEventListener('submit', onSubmitHandler);
-document.querySelector('#picEditpanel form').addEventListener('submit', onSubmitHandler);
 
 document.querySelector('#piclocNewpanel  form').addEventListener('submit', onSubmitImageHandler);
 document.querySelector('#picuserNewpanel  form').addEventListener('submit', onSubmitImageHandler);

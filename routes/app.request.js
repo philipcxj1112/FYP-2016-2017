@@ -10,7 +10,7 @@ var dateFormat = require('dateformat');
 
 var app = express.Router();
 
-var pool = anyDB.createPool('mysql://root:root@127.0.0.1/FYP', {
+var pool = anyDB.createPool('mysql://root:523422633@127.0.0.1/FYP2016', {
     min: 2, max: 10
 });
 
@@ -112,17 +112,21 @@ app.post('/user/:uid', function (req, res) {
 		        console.error(error);
 		        return res.status(500).json({ 'dbError': 'check server log' }).end();
 		    }
-		    pool.query('SELECT * FROM UPrelation u, Picture p  WHERE uid = (?) AND u.pid = p.pid',
-				[result.rows[0].uid],
-				function (error, relateion) {
-				    if (error) {
-				        console.error(error);
-				        return res.status(500).json({ 'dbError': 'check server log' }).end();
-				    }
-				    //res.status(500).json({'dbError': 'check server log'}).end();
-				    res.status(200).json({ 'User': result.rows, 'Picture': relateion.rows }).end();
-				}
-			);
+		    if (result.rowCount == 0){
+		    	res.status(200).json({ 'User': result.rows, 'Picture': [] }).end();
+		    }else{
+		   		pool.query('SELECT * FROM UPrelation u, Picture p  WHERE uid = (?) AND u.pid = p.pid',
+					[result.rows[0].uid],
+					function (error, relateion) {
+				    	if (error) {
+				    	    console.error(error);
+				        	return res.status(500).json({ 'dbError': 'check server log' }).end();
+				    	}
+				   		 //res.status(500).json({'dbError': 'check server log'}).end();
+				    	res.status(200).json({ 'User': result.rows, 'Picture': relateion.rows }).end();
+					}
+				);
+		   	}
 		});
 
 });

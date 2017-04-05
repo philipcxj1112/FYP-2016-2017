@@ -7,7 +7,7 @@ var express = require('express'),
 //	csrf = require('csurf'),
 	cookieParser = require('cookie-parser');
 
-var pool = anyDB.createPool('mysql://root:root@127.0.0.1/FYP', {
+var pool = anyDB.createPool('mysql://root:523422633@127.0.0.1/FYP2016', {
     min: 2, max: 20
 });
 
