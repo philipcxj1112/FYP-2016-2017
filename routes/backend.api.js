@@ -7,8 +7,9 @@ var cookieParser = require('cookie-parser');
 //var csrf = require('csurf');
 var fs = require('fs');
 var multer = require('multer');
-var plotly = require('plotly')("philipcxj", "DtSALEZYkCYirIVEfWHu")
+var plotly = require('plotly')("philipcxj", "DtSALEZYkCYirIVEfWHu");
 var dateFormat = require('dateformat');
+var config = require('../config.js');
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -25,7 +26,7 @@ var upload = multer({ storage: storage })
 
 //var upload = multer({ dest: 'public/uploads/' });
 
-var pool = anyDB.createPool('mysql://root:523422633@127.0.0.1/FYP2016', {
+var pool = anyDB.createPool(config.dbURI, {
     min: 2, max: 20
 });
 var inputPattern = {
@@ -97,7 +98,7 @@ app.post('/user/add', function (req, res) {
 
 });
 
-app.post('/pic/location/add', upload.fields([{ name: 'img', maxCount: 1 }, { name: 'sound', maxCount: 1 }]),  function (req, res) {
+app.post('/pic/location/add', upload.fields([{ name: 'img', maxCount: 1 }]),  function (req, res) {
 
     // put your input validations and/or sanitizations here
     // Reference: https://www.npmjs.com/package/express-validator
@@ -120,7 +121,7 @@ app.post('/pic/location/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
     }
 
 	if (!req.files) {
-        return res.status(403).json({'InputError':'expect 2 file upload'}).end();
+        return res.status(403).json({'InputError':'expect file upload'}).end();
     }
 
     var upload = req.files;
@@ -129,16 +130,11 @@ app.post('/pic/location/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
         return res.status(403).json({'imageInputError':'expect image file'}).end();
     }
 
-    if (!/^audio\/(mp3|wma)$/i.test(upload.sound[0].mimetype)) {
-        return res.status(403).json({'imageInputError':'expect sound file'}).end();
-    }
-
 	var imgurl = '/uploads/'+ req.files.img[0].originalname;
 
-	var soundurl = '/uploads/' +req.files.sound[0].originalname;
 
 	console.log(imgurl);
-	console.log(soundurl);
+	//console.log(soundurl);
 	console.log(req.files);
 
     // manipulate the DB accordingly using prepared statement
@@ -155,15 +151,15 @@ app.post('/pic/location/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
 		        return res.status(400).json({ 'inputError': 'Invalid Location' }).end();
 		    }
 		    else {
-		        pool.query('INSERT INTO Picture (imgurl, soundurl, description, pname) VALUES (?, ?, ?, ?)',
-					[ imgurl, soundurl, req.body.description, req.body.pname],
+		        pool.query('INSERT INTO Picture (imgurl,  description, pname) VALUES (?, ?, ?)',
+					[ imgurl, req.body.description, req.body.pname],
 					function (error, result) {
 					    if (error) {
 					        console.error(error);
 					        return res.status(500).json({ 'dbError': 'check server log' }).end();
 					    }
-						pool.query('SELECT * FROM Picture WHERE imgurl = ? AND soundurl = ?',
-							[imgurl, soundurl],
+						pool.query('SELECT * FROM Picture WHERE imgurl = ?',
+							[imgurl],
 							function (error, pic) {
 								if (error) {
 									console.error(error);
@@ -187,7 +183,7 @@ app.post('/pic/location/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
 
 });
 
-app.post('/pic/personal/add', upload.fields([{ name: 'img', maxCount: 1 }, { name: 'sound', maxCount: 1 }]), function (req, res) {
+app.post('/pic/personal/add', upload.fields([{ name: 'img', maxCount: 1 }]), function (req, res) {
 
     // put your input validations and/or sanitizations here
     // Reference: https://www.npmjs.com/package/express-validator
@@ -210,7 +206,7 @@ app.post('/pic/personal/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
     }
 
 	if (!req.files) {
-        return res.status(403).json({'InputError':'expect 2 file upload'}).end();
+        return res.status(403).json({'InputError':'expect file upload'}).end();
     }
 
     var upload = req.files;
@@ -221,38 +217,33 @@ app.post('/pic/personal/add', upload.fields([{ name: 'img', maxCount: 1 }, { nam
         return res.status(403).json({'imageInputError':'expect image file'}).end();
     }
 
-    if (!/^audio\/(mp3|wma)$/i.test(upload.sound[0].mimetype)) {
-        return res.status(403).json({'imageInputError':'expect audio file'}).end();
-    }
 
 	var imgurl = '/uploads/'+ req.files.img[0].originalname;
 
-	var soundurl = '/uploads/' +req.files.sound[0].originalname;
-
 	console.log(imgurl);
-	console.log(soundurl);
+	//console.log(soundurl);
 	console.log(req.files);
 
     // manipulate the DB accordingly using prepared statement
     // (Prepared Statement := use ? as placeholder for values in sql statement;
     //   They'll automatically be replaced by the elements in next array)
-    pool.query('SELECT * FROM Picture Where imgurl = (?) AND soundURL = (?)',
-		[imgurl, soundurl],
+    pool.query('SELECT * FROM Picture Where imgurl = (?)',
+		[imgurl],
 		function (error, pcheck) {
 		    if (error) {
 		        console.error(error);
 		        return res.status(500).json({ 'dbError': 'check server log' }).end();
 		    }
 		    if (pcheck.rowCount == 0) {
-		        pool.query('INSERT INTO Picture (imgurl, soundurl, description, pname) VALUES ( ?, ?, ?, ?)',
-                    [ imgurl, soundurl, req.body.description, req.body.pname],
+		        pool.query('INSERT INTO Picture (imgurl, description, pname) VALUES ( ?, ?, ?)',
+                    [ imgurl, req.body.description, req.body.pname],
                      function (error, insert) {
                          if (error) {
                              console.error(error);
                              return res.status(500).json({ 'dbError': 'check server log' }).end();
                          }
-                         pool.query('SELECT pid FROM Picture WHERE imgurl = (?) AND soundURL = (?)',
-                            [imgurl, soundurl],
+                         pool.query('SELECT pid FROM Picture WHERE imgurl = (?)',
+                            [imgurl],
                             function (error, getpid) {
                                 if (error) {
                                     console.error(error);

@@ -6,8 +6,9 @@ var express = require('express'),
 	crypto = require('crypto'),
 //	csrf = require('csurf'),
 	cookieParser = require('cookie-parser');
+var config = require('../config.js');
 
-var pool = anyDB.createPool('mysql://root:523422633@127.0.0.1/FYP2016', {
+var pool = anyDB.createPool(config.dbURI, {
     min: 2, max: 20
 });
 

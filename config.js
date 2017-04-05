@@ -1,0 +1,1 @@
+exports.dbURI = 'mysql://root:523422633@127.0.0.1/FYP2016';
