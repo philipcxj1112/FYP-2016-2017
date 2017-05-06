@@ -55,37 +55,16 @@ app.post('/stat/:uid/:pid/:lid', function (req, res) {
     // manipulate the DB accordingly using prepared statement
     // (Prepared Statement := use ? as placeholder for values in sql statement;
     //   They'll automatically be replaced by the elements in next array)
-    pool.query('SELECT * FROM stat WHERE pid = (?) AND uid = (?) AND lid = (?) AND rdate = STR_TO_DATE(?, ?)',
-		[req.params.pid, req.params.uid, req.params.lid, currentdate, dformat],
-		function (error, result) {
-		    if (error) {
-		        console.error(error);
-		        return res.status(500).json({ 'dbError': 'check server log' }).end();
-		    }
-		    if (result.rowCount == 0) {
-		        pool.query('INSERT INTO stat (uid, pid, lid, count, rdate) VALUES (?, ?, ?, 1, STR_TO_DATE(?, ?))',
-					[req.params.uid, req.params.pid, req.params.lid, currentdate, dformat],
-					function (error, insert) {
-					    if (error) {
-					        console.error(error);
-					        return res.status(500).json({ 'dbError': 'check server log' }).end();
-					    }
-					}
-				);
-		    } else {
-		        pool.query('UPDATE stat set count = count + 1 WHERE uid = (?) AND pid = (?) AND lid = (?) AND rdate = STR_TO_DATE(?, ?)',
-					[req.params.uid, req.params.pid, req.params.lid, currentdate, dformat],
-					function (error, update) {
-					    if (error) {
-					        console.error(error);
-					        return res.status(500).json({ 'dbError': 'check server log' }).end();
-					    }
-					}
-				);
-		    }
-		    res.status(200).json({ 'Update Sucess!': 'yes' }).end();
-		}
-	);
+	pool.query('INSERT INTO stat (uid, pid, lid, count, rdate) VALUES (?, ?, ?, 1, STR_TO_DATE(?, ?))',
+		[req.params.uid, req.params.pid, req.params.lid, currentdate, dformat],
+		function (error, insert) {
+			if (error) {
+				console.error(error);
+				return res.status(500).json({ 'dbError': 'check server log' }).end();
+			}
+		
+		res.status(200).json({ 'Update Sucess!': 'yes' }).end();
+	});
 
 });
 

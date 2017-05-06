@@ -27,7 +27,7 @@ var upload = multer({ storage: storage })
 //var upload = multer({ dest: 'public/uploads/' });
 
 var pool = anyDB.createPool(config.dbURI, {
-    min: 2, max: 20
+    min: 2, max: 100
 });
 var inputPattern = {
     name: /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/,
@@ -172,14 +172,20 @@ app.post('/pic/location/add', upload.fields([{ name: 'img', maxCount: 1 }]),  fu
 											console.error(error);
 											return res.status(500).json({ 'dbError': 'check server log' }).end();
 										}
-										res.status(200).json(result).end();
+										pool.query('INSERT INTO PLrelation (lid, pid) VALUES (1, ?)',
+											[req.body.lid, pic.rows[0].pid],
+											function (error, update2) {
+												if (error) {
+													console.error(error);
+													return res.status(500).json({ 'dbError': 'check server log' }).end();
+												}
+												res.status(200).json(result).end();
+										});
 								});
 						});
-					}
-                );
+				});
 		    }
-		}
-	);
+	});
 
 });
 
@@ -675,45 +681,98 @@ app.post('/result', function (req, res) {
     if (errors) {
         return res.status(400).json({ 'inputError': errors }).end();
     }
+	
+	var trace = {};
+	//var figure = { 'data': [] , layout:[{barmode: "stack"}]};
 
 
-	pool.query('SELECT TIME(t2.start_time) AS time, IFNULL(temp.tcount, 0) AS count FROM timetable t2 LEFT JOIN (SELECT TIME(t.start_time) AS time, COUNT(*) AS tcount FROM timetable t, stat s WHERE DATE(s.rdate) = (?) AND TIME(s.rdate) BETWEEN TIME(t.start_time) AND time(t.end_time) AND s.uid = (?) AND s.lid = (?) GROUP BY t.start_time) AS temp ON temp.time = TIME(t2.start_time);',
-		[req.body.date, req.body.uid, req.body.lid],
-		function (error, result) {
+	
+	pool.query('SELECT * FROM PLrelation pl, Picture p WHERE pl.lid = (?) AND p.pid = pl.pid',
+		[req.body.lid],
+		function(error, picResult) {
 			if (error) {
 		        console.error(error);
 		        return res.status(500).json({ 'dbError': 'check server log' }).end();
-		    }
-			console.log(result.rows);
-			var trace1 = {
-				x: [],
-				y: [],
-				type: "scatter"
-			};
+		    }			
+			pool.query('SELECT TIME(start_time) AS time FROM timetable',
+				[],
+				function(error, timeResult) {
+					if (error) {
+						console.error(error);
+						return res.status(500).json({ 'dbError': 'check server log' }).end();
+					}			
+					pool.query('SELECT TIME(t2.start_time) AS time, IFNULL(temp.pid,0) AS pid, IFNULL(temp.pname,0) AS pname, IFNULL(temp.tcount, 0) AS count FROM timetable t2 LEFT JOIN (SELECT TIME(t.start_time) AS time, s.pid, p.pname, COUNT(s.pid) AS tcount FROM timetable t, Picture p, stat s WHERE DATE(s.rdate) = (?) AND TIME(s.rdate) BETWEEN TIME(t.start_time) AND time(t.end_time) AND s.uid = (?) AND s.lid = (?) AND s.pid = p.pid GROUP BY s.pid, t.start_time) AS temp ON temp.time = TIME(t2.start_time)',
+						[req.body.date, req.body.uid, req.body.lid],
+						function(error, queryResult) {
+							if (error) {
+								console.error(error);
+								return res.status(500).json({ 'dbError': 'check server log' }).end();
+							}
+							//console.log(picResult.rows);
+							for(var k = 0; k < queryResult.rowCount; k++){
+								for(var i = 0; i < picResult.rowCount; i++){
+									trace[i] = {
+										x:[],
+										y:[],
+										name: picResult.rows[i].pname,
+										type: "bar"
+									};
+									console.log(trace[i]);
+									for(var j = 0; j < timeResult.rowCount; j++){
+										trace[i].x[j] = timeResult.rows[j].time;
+										trace[i].y[j] = 0;
+									}
+								}
+							}
+							var data = [];
 
-			for(var i = 0; i < result.rowCount; i++){
-				trace1.x[i] = result.rows[i].time;
-				trace1.y[i] = result.rows[i].count;
-			}
+							for(var a = 0; a < queryResult.rowCount; a++){
+								for(var b = 0; b < picResult.rowCount; b++){
+									for(var c = 0; c < timeResult.rowCount; c++){
+										if((queryResult.rows[a].pname == picResult.rows[b].pname) && (queryResult.rows[a].time == timeResult.rows[c].time)){
+											trace[b].y[c] = queryResult.rows[a].count;
+											//console.log(trace[a]);
+										}
+									}
+									data[b] = trace[b];
+								}
+								//console.log(trace[a]);
+							}
+							//console.log(data);
 
-			var figure = { 'data': [trace1] };
 
-			var imgOpts = {
-				format: 'png',
-				width: 1000,
-				height: 500
-			};
+							var layout = {barmode: "stack"};
+							var graphOptions = {layout: layout, filename: "stacked-bar", fileopt: "overwrite"};
+							plotly.plot(data, graphOptions, function (err, msg) {
+  						  		console.log(msg);
+							});
+/*
+							plotly.getFigure('philipcxj', 0, function (err, figure) {
+								if (err) return console.log(err);
 
-			plotly.getImage(figure, imgOpts, function (error, imageStream) {
-				if (error) return console.log (error);
+									var imgOpts = {
+										format: 'png',
+										width: 1000,
+										height: 500
+									};
 
-				var fileStream = fs.createWriteStream('./public/graph/plotly.png');
-				imageStream.pipe(fileStream);
-			});
-			res.status(200).json({ status: 'Sucess' }).end();
-		}
-	);
 
+
+								    plotly.getImage(figure, imgOpts, function (error, imageStream) {
+								        if (error) return console.log (error);
+								
+								       var fileStream = fs.createWriteStream('./public/graph/plotly.png');
+								        imageStream.pipe(fileStream);
+								    });
+								});*/
+
+
+							res.status(200).json({ status: 'Sucess' }).end();
+							
+			
+						});
+				});
+		});
 
 
 });

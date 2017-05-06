@@ -77,14 +77,16 @@ function onChangeHandler(e) {
 					var temp = document.getElementById('GraphGen');
 					if(!temp){
 						sleep(2000);
-						var blankImage = document.createElement("img");
+						var blankImage = document.createElement("iframe");
 						blankImage.id = 'GraphGen';
+						blankImage.style.width = "1000px";
+        				blankImage.style.height = "500px";
 						document.getElementById('Graph').appendChild(blankImage);
-						document.getElementById('GraphGen').src = '../graph/plotly.png';
+						document.getElementById('GraphGen').src = 'https://plot.ly/~philipcxj/0.embed';
 					}
 					else{			
 						sleep(2000);
-						document.getElementById('GraphGen').src = '../graph/plotly.png?' + new Date().getTime();						
+						document.getElementById('GraphGen').src = 'https://plot.ly/~philipcxj/0.embed?' + new Date().getTime();						
 					
 				}	
 			}
