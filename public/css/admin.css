@@ -47,3 +47,14 @@ li:last-child {
     margin: 0px 0px;
     cursor: pointer;
 }
+
+table, th, td {
+    border: 1px solid black;
+    margin-top: 20px;
+    margin-left: 20px;
+}
+
+button{
+    margin-top: 10px;
+    margin-left: 20px;
+}

@@ -3,6 +3,7 @@ var anyDB = require('any-db');
 //var csrf = require('csurf');
 var cookieParser = require('cookie-parser');
 var config = require('../config.js');
+var expressValidator = require('express-validator');
 
 var app = express.Router();
 
@@ -11,6 +12,13 @@ var pool = anyDB.createPool(config.dbURI, {
 });
 
 //var csrfProtection = csrf({ cookie: true });
+
+
+var inputPattern = {
+    number: /^[0-9]*$/,
+};
+
+app.use(expressValidator());
 
 app.use(cookieParser());
 
@@ -141,6 +149,24 @@ app.get('/beacon', function (req, res) {
         title: '2016 Final Year Project'
     });
 
+});
+
+app.get('/floor/:fid', function (req, res) {
+    // async fetch data from SQL, render page when ready
+    pool.query('SELECT * FROM Location WHERE floor= (?)', 
+        [req.params.fid],
+        function (error, loc) {
+        if (error) {
+            console.error(error);
+            res.status(500).end();
+            return;
+        }
+        res.render('admin-panel-BeaconInfo', {
+            layout: 'admin',
+            title: '2016 Final Year Project',
+            loc: loc.rows,
+        });
+    });
 });
 
 

@@ -13,22 +13,27 @@
 </li>
 </ul>
 
-<br>
+<table>
+<caption>Beacon Information</caption>
+  <tr>
+    <th>Location</th>
+    <th>UUID</th> 
+    <th>Major</th>
+    <th>Minor</th>
+  </tr>
+  {{#each loc}}
+  <tr>
+    <td>{{lname}}</td>
+    <td>{{UUID}}</td>
+    <td>{{major}}</td>
+    <td>{{minor}}</td>
+  </tr>
+  {{/each}}
+</table>
+<button type="button" id="estimo">Click Me to go to estimo!</button>
 
-<fieldset id="beaconLocpanel">
-		<legend><b>Trace Beacon Location</b></legend>
-		<a href="/admin/floor/1">
-  			<img src="/floorplan/CRS Floorplan_1F.jpg" alt="1/F floorplan" height="330" width="500" />
-		</a>
-		<br>
-    <a href="/admin/floor/2">
-  			<img src="/floorplan/CRS Floorplan_2F.jpg" alt="2/F floorplan" height="330" width="500" />
-		</a>
-		<br>
-    <a href="/admin/floor/3">
-  			<img src="/floorplan/CRS Floorplan_3F.jpg" alt="3/F floorplan" height="330" width="500" />
-		</a>
-		
-</fieldset>
+<div id="estimoframe"></div>
+
 
 <script type="text/javascript" src="/lib/admin-panel-Beacon.js"></script>
+
